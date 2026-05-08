@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>灵境·雷诺曼 | 神谕手札 · 预绘典藏版</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=IM+Fell+English:ital@0;1&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+
+        @import url('https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&display=swap');
+
+        :root {
+            --ink-black:     #080608;
+            --deep-void:     #060409;
+            --parchment:     #f0e6cc;
+            --aged-parchment:#dfc9a0;
+            --copper:        #a8682e;
+            --copper-bright: #c97f48;
+            --copper-pale:   #ddb07a;
+            --sepia:         #2e1e0f;
+            --sepia-pale:    #7a5535;
+            --gold:          #c4a24a;
+            --gold-bright:   #e2bb5c;
+            --gold-pale:     #edd898;
+            --gold-dim:      #8a7030;
+            --nebula-teal:   rgba(28,80,72,0.55);
+            --nebula-violet: rgba(45,22,68,0.6);
+            --nebula-indigo: rgba(18,22,55,0.7);
+            --star-core:     rgba(255,240,200,0.9);
+            --card-w:        128px;
+            --card-h:        198px;
+            --ease-sacred:   cubic-bezier(0.23, 1, 0.32, 1);
+            --ease-emerge:   cubic-bezier(0.16, 1, 0.3, 1);
+            --font-serif:    'Cormorant Garamond', 'Noto Serif SC', 'Source Han Serif SC', 'STZhongsong', serif;
+            --font-title:    'Cinzel', 'Noto Serif SC', 'Source Han Serif SC', 'STZhongsong', serif;
+            --font-deco:     'Cinzel Decorative', 'Cinzel', serif;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; user-select:none; }
+        html { height:100%; }
+        body {
+            background-color: var(--deep-void);
+            font-family: var(--font-serif);
+            min-height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            position: relative;
+            color: var(--parchment);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── 背景：三层星云 + 星场 + 炼金纹样 ── */
+        .bg-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+
+        /* 层1：深空底色 */
+        .bg-cosmos {
+            position: absolute; inset: 0;
+            background: var(--deep-void);
+        }
+
+        /* 层2：星云色雾 —— 多重径向渐变构成三维感光源 */
+        .bg-nebula {
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 15% 25%,  rgba(28,80,72,0.42)    0%, transparent 65%),
+                radial-gradient(ellipse 70% 50% at 85% 75%,  rgba(45,22,68,0.50)    0%, transparent 60%),
+                radial-gradient(ellipse 50% 40% at 50% 5%,   rgba(70,35,10,0.35)    0%, transparent 55%),
+                radial-gradient(ellipse 40% 35% at 20% 85%,  rgba(18,22,55,0.45)    0%, transparent 50%),
+                radial-gradient(ellipse 55% 45% at 78% 15%,  rgba(55,28,8,0.30)     0%, transparent 50%),
+                radial-gradient(ellipse 30% 25% at 92% 45%,  rgba(100,60,15,0.18)   0%, transparent 40%);
+        }
+
+        /* 层3：金色光晕 —— 原始版本，保留 */
+        .bg-aureole {
+            position: absolute; inset: 0;
+            background:
+                radial-gradient(ellipse 45% 38% at 50% 42%, rgba(180,130,40,0.10) 0%, rgba(120,80,20,0.04) 55%, transparent 75%),
+                radial-gradient(ellipse 20% 15% at 50% 42%, rgba(220,170,70,0.07) 0%, transparent 100%);
+            animation: aurPulse 8s ease-in-out infinite;
+        }
+        @keyframes aurPulse {
+            0%,100% { opacity:0.8; }
+            50%      { opacity:1.3; }
+        }
+
+        /* ── 新增主光源动画：动态光晕，缓慢扫过场景 ── */
+        .moving-light {
+            position: absolute;
+            width: 140%;
+            height: 140%;
+            top: -20%;
+            left: -20%;
+            background: radial-gradient(circle at 30% 40%, rgba(226,187,92,0.18) 0%, rgba(150,100,35,0.06) 45%, transparent 70%);
+            filter: blur(40px);
+            animation: driftLight 22s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 1;
+            mix-blend-mode: screen;
+        }
+        @keyframes driftLight {
+            0% { transform: translate(0%, 0%) scale(1); opacity: 0.5; }
+            25% { transform: translate(8%, 5%) scale(1.1); opacity: 0.8; }
+            50% { transform: translate(-2%, 12%) scale(0.95); opacity: 0.6; }
+            75% { transform: translate(-10%, -3%) scale(1.05); opacity: 0.75; }
+            100% { transform: translate(0%, 0%) scale(1); opacity: 0.5; }
+        }
+
+        /* 层4：微粒噪点肌理 */
+        .bg-grain {
+            position: absolute; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.055'/%3E%3C/svg%3E");
+            background-size: 280px 280px; mix-blend-mode: screen; opacity: 0.6;
+        }
+
+        /* 层5：炼金符文平铺图案 */
+        .bg-sigils {
+            position: absolute; inset: 0; opacity: 0.055;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200'%3E%3Cg fill='none' stroke='%23c8a84b' stroke-width='0.6'%3E%3Ccircle cx='100' cy='100' r='78'/%3E%3Ccircle cx='100' cy='100' r='52'/%3E%3Ccircle cx='100' cy='100' r='26'/%3E%3Cpolygon points='100,22 174,156 26,156'/%3E%3Cpolygon points='100,178 26,44 174,44'/%3E%3Cline x1='100' y1='22' x2='100' y2='178'/%3E%3Cline x1='22' y1='100' x2='178' y2='100'/%3E%3Cline x1='37' y1='37' x2='163' y2='163'/%3E%3Cline x1='163' y1='37' x2='37' y2='163'/%3E%3Ccircle cx='100' cy='100' r='6' fill='%23c8a84b' opacity='0.3'/%3E%3C/g%3E%3C/svg%3E");
+            background-size: 220px 220px;
+            animation: sigilDrift 120s linear infinite;
+        }
+        @keyframes sigilDrift {
+            from { background-position: 0 0; }
+            to   { background-position: 220px 220px; }
+        }
+
+        /* 层6：四角深焦晕影 */
+        .bg-vignette {
+            position: fixed; inset: 0; z-index: 1; pointer-events: none;
+            background:
+                radial-gradient(ellipse 85% 70% at 50% 50%, transparent 30%, rgba(4,2,8,0.70) 100%),
+                linear-gradient(to bottom, rgba(4,2,8,0.35) 0%, transparent 18%, transparent 82%, rgba(4,2,8,0.50) 100%);
+        }
+
+        /* ── 漂浮粒子 Canvas 层 (新增) ── */
+        #floatingParticles {
+            position: fixed;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+            opacity: 0.7;
+        }
+
+        /* ── 星点 canvas（原有）── */
+        #starfield {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none;
+        }
+
+        /* ── 金线角框 ── */
+        .frame-corner { position: fixed; width: clamp(55px, 9vw, 100px); height: clamp(55px, 9vw, 100px); z-index: 10; pointer-events: none; opacity: 0.55; }
+        .frame-corner svg { width: 100%; height: 100%; }
+        .frame-corner.tl { top: 14px; left: 14px; }
+        .frame-corner.tr { top: 14px; right: 14px; transform: scaleX(-1); }
+        .frame-corner.bl { bottom: 14px; left: 14px; transform: scaleY(-1); }
+        .frame-corner.br { bottom: 14px; right: 14px; transform: scale(-1,-1); }
+
+        .frame-edge {
+            position: fixed; left: 0; right: 0; z-index: 10; pointer-events: none;
+            height: 1px;
+            background: linear-gradient(to right, transparent 8%, rgba(196,162,74,0.4) 20%, rgba(196,162,74,0.55) 50%, rgba(196,162,74,0.4) 80%, transparent 92%);
+        }
+        .frame-edge.top { top: 14px; }
+        .frame-edge.bottom { bottom: 14px; }
+        .frame-edge-v {
+            position: fixed; top: 0; bottom: 0; z-index: 10; pointer-events: none;
+            width: 1px;
+            background: linear-gradient(to bottom, transparent 8%, rgba(196,162,74,0.35) 20%, rgba(196,162,74,0.45) 50%, rgba(196,162,74,0.35) 80%, transparent 92%);
+        }
+        .frame-edge-v.left  { left: 14px; }
+        .frame-edge-v.right { right: 14px; }
+
+        /* 视图容器 */
+        .view {
+            position: fixed; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none; transition: opacity 1.2s var(--ease-sacred); z-index: 20; padding: 30px 20px;
+        }
+        .view.active { opacity: 1; pointer-events: auto; }
+        #resultView { overflow-y: auto; justify-content: flex-start; padding-top: 50px; padding-bottom: 70px; }
+        #resultView::-webkit-scrollbar { width: 4px; }
+        #resultView::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
+
+        /* ── 文字系统 ── */
+        .title-cinzel {
+            font-family: var(--font-deco); font-weight: 700;
+            font-size: clamp(2.2rem, 6.5vw, 3.6rem);
+            letter-spacing: 0.22em; color: var(--gold-bright);
+            text-shadow:
+                0 0 60px rgba(196,162,74,0.35),
+                0 0 120px rgba(196,162,74,0.12),
+                0 2px 8px rgba(0,0,0,0.9);
+            line-height: 1.15; text-align: center;
+            animation: titleShimmer 6s ease-in-out infinite;
+        }
+        @keyframes titleShimmer {
+            0%,100% { text-shadow: 0 0 60px rgba(196,162,74,0.35), 0 0 120px rgba(196,162,74,0.12), 0 2px 8px rgba(0,0,0,0.9); }
+            50%      { text-shadow: 0 0 80px rgba(226,187,92,0.55), 0 0 160px rgba(196,162,74,0.20), 0 2px 8px rgba(0,0,0,0.9); }
+        }
+        .title-sub {
+            font-family: var(--font-title); font-weight: 400;
+            font-size: clamp(0.62rem, 2vw, 0.78rem);
+            letter-spacing: 0.55em; color: var(--copper-pale); opacity: 0.75;
+            margin-top: 6px; text-align: center; text-transform: uppercase;
+        }
+        .subtitle-italic {
+            font-family: var(--font-serif); font-style: italic; font-weight: 300;
+            font-size: clamp(0.88rem, 3vw, 1.05rem);
+            letter-spacing: 0.35em; color: var(--copper-pale); opacity: 0.7;
+            margin-top: 10px; text-align: center;
+        }
+        .section-title {
+            font-family: var(--font-title); font-size: 1.05rem;
+            letter-spacing: 0.3em; color: var(--gold); font-weight: 400;
+            text-shadow: 0 0 20px rgba(196,162,74,0.3);
+        }
+
+        /* 分隔线 */
+        .divider { display: flex; align-items: center; gap: 14px; width: 100%; max-width: 440px; margin: 22px auto; opacity: 0.55; }
+        .divider-line { flex: 1; height: 1px; background: linear-gradient(to right, transparent, var(--gold), transparent); }
+        .divider-glyph { color: var(--gold); font-size: 0.7rem; letter-spacing: 3px; }
+
+        /* ── 按钮：镀金质感，双层光晕 ── */
+        .sacred-btn {
+            position: relative;
+            background: linear-gradient(160deg, rgba(30,22,8,0.85) 0%, rgba(18,13,4,0.95) 100%);
+            border: 1px solid rgba(196,162,74,0.6);
+            color: var(--gold-pale); padding: 0.85rem 1.8rem;
+            font-family: var(--font-serif); font-style: italic; font-weight: 400; font-size: 0.95rem;
+            letter-spacing: 0.2em; cursor: pointer; border-radius: 2px;
+            transition: all 0.5s var(--ease-sacred);
+            box-shadow: 0 2px 20px rgba(0,0,0,0.6), inset 0 1px 0 rgba(196,162,74,0.12), inset 0 -1px 0 rgba(0,0,0,0.5);
+            white-space: nowrap;
+        }
+        .sacred-btn::before {
+            content: ''; position: absolute; top: 0; left: 15%; right: 15%; height: 1px;
+            background: linear-gradient(to right, transparent, rgba(226,187,92,0.55), transparent);
+            pointer-events: none;
+        }
+        .sacred-btn::after {
+            content: ''; position: absolute; inset: 5px;
+            border: 1px solid rgba(196,162,74,0.12); pointer-events: none;
+            transition: border-color 0.5s;
+        }
+        .sacred-btn:hover {
+            border-color: rgba(226,187,92,0.85);
+            color: var(--gold-bright);
+            background: linear-gradient(160deg, rgba(40,30,10,0.95) 0%, rgba(25,18,6,0.98) 100%);
+            box-shadow:
+                0 0 25px rgba(196,162,74,0.25),
+                0 0 60px rgba(196,162,74,0.10),
+                0 4px 30px rgba(0,0,0,0.7),
+                inset 0 1px 0 rgba(226,187,92,0.2),
+                inset 0 -1px 0 rgba(0,0,0,0.6);
+            transform: translateY(-1px);
+        }
+        .sacred-btn:hover::after { border-color: rgba(196,162,74,0.22); }
+        .sacred-btn:active { transform: translateY(0); }
+
+        .btn-group {
+            display: flex; gap: 1.2rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem;
+        }
+
+        /* 问题输入区 */
+        .question-wrap { position: relative; width: min(560px, 85vw); margin-top: 2rem; }
+        .question-label {
+            font-family: var(--font-serif); font-style: italic; font-size: 0.9rem;
+            color: var(--copper-pale); letter-spacing: 0.15em; opacity: 0.8; margin-bottom: 10px; display: block;
+        }
+        .question-input {
+            width: 100%;
+            background: rgba(14,11,7,0.6);
+            border: none;
+            border-bottom: 1px solid var(--copper);
+            border-top: 1px solid rgba(200,168,75,0.15);
+            padding: 16px 20px;
+            font-size: 1.15rem;
+            font-family: var(--font-serif);
+            font-style: italic;
+            color: var(--parchment);
+            outline: none;
+            letter-spacing: 0.05em;
+            transition: background 0.4s, border-color 0.4s, box-shadow 0.4s;
+            backdrop-filter: blur(4px);
+            resize: none;
+            line-height: 1.45;
+            min-height: 56px;
+            overflow: hidden;
+            box-sizing: border-box;
+        }
+        .question-input:focus {
+            border-bottom-color: var(--gold);
+            background: rgba(20,16,10,0.85);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+        .question-error-msg {
+            font-family: var(--font-serif); font-style: italic; font-size: 0.85rem; color: #c87a5a;
+            letter-spacing: 0.1em; margin-top: 8px; opacity: 0; transform: translateY(-4px); transition: all 0.3s; pointer-events: none;
+        }
+        .question-error-msg.visible { opacity: 1; transform: translateY(0); }
+
+        /* 抽牌视图 */
+        #drawView { justify-content: space-between; padding: 2vh 0 2vh; gap: 1vh; }
+        .draw-top { text-align: center; flex-shrink: 0; padding: 0 16px; z-index: 10; margin-bottom: 0; }
+        .draw-guide { font-family: var(--font-title); font-size: 0.8rem; letter-spacing: 0.45em; color: var(--gold-pale); opacity: 0.8; text-transform: uppercase; margin-bottom: 8px; }
+        .draw-question-display { font-family: var(--font-serif); font-style: italic; font-size: clamp(1rem, 3.8vw, 1.3rem); color: var(--parchment); letter-spacing: 0.05em; line-height: 1.4; max-width: 85vw; margin: 0 auto; opacity: 0.9; text-shadow: 0 2px 8px rgba(0,0,0,0.8); }
+
+        .deck-stage-wrap { flex: 1; display: flex; align-items: center; justify-content: center; width: 100%; position: relative; min-height: 280px; margin: 0; }
+        .deck-stage { position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; perspective: 1600px; }
+
+        .slots-section { flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 0 20px 16px; z-index: 10; width: 100%; }
+        .draw-hint { font-family: var(--font-serif); font-style: italic; font-size: 0.85rem; color: var(--gold-pale); letter-spacing: 0.18em; opacity: 0.8; text-align: center; }
+
+        .slots-row { display: flex; gap: clamp(20px, 5vw, 2.5rem); justify-content: center; width: 100%; max-width: 700px; }
+        .slot {
+            width: clamp(100px, 26vw, 128px);
+            height: clamp(140px, 36vw, 176px);
+            border: 1px solid rgba(200,168,75,0.3);
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(180deg, rgba(10,8,4,0.45) 0%, rgba(20,15,8,0.75) 100%);
+            backdrop-filter: blur(8px);
+            transition: all 0.5s var(--ease-sacred);
+            color: var(--sepia-pale);
+            font-family: var(--font-serif);
+            font-style: italic;
+            letter-spacing: 0.1em;
+            gap: 8px;
+            position: relative;
+            overflow: hidden;
+        }
+        .slot::before { content: ''; position: absolute; inset: 6px; border: 1px solid rgba(200,168,75,0.08); border-radius: 6px; pointer-events: none; }
+        .slot-symbol { font-size: clamp(1.6rem, 6vw, 2.2rem); opacity: 0.5; color: var(--gold); }
+        .slot-label { font-size: clamp(0.7rem, 3vw, 0.85rem); letter-spacing: 0.16em; color: var(--copper-pale); opacity: 0.7; text-align: center; white-space: nowrap; }
+        .slot.filled { border-color: rgba(200,168,75,0.75); box-shadow: 0 0 28px rgba(200,168,75,0.2), inset 0 0 20px rgba(0,0,0,0.5); background: rgba(20,15,8,0.9); }
+        .slot canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            display: block;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.6);
+        }
+        .slot:not(.filled) { justify-content: center; }
+
+        /* 主卡牌样式 */
+        .tarot-card {
+            position: absolute;
+            width: var(--card-w);
+            height: var(--card-h);
+            cursor: pointer;
+            transform-style: preserve-3d;
+            transition: transform 0.4s var(--ease-sacred), box-shadow 0.3s ease;
+            border-radius: 8px;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.8), 0 0 0 1px rgba(200,168,75,0.3);
+            will-change: transform;
+            transform: translateX(var(--tx,0)) translateY(var(--ty,0)) rotate(var(--rot,0deg)) scale(1);
+        }
+        .tarot-card:hover, .tarot-card:active {
+            transform: translateX(var(--tx,0)) translateY(calc(var(--ty,0) - 22px)) rotate(var(--rot,0deg)) scale(1.08);
+            z-index: 300 !important;
+            box-shadow: 0 24px 48px rgba(0,0,0,0.9), 0 0 0 2px var(--gold-bright), 0 0 32px rgba(200,168,75,0.5);
+        }
+
+        .card-back, .card-front {
+            position: absolute;
+            inset: 0;
+            backface-visibility: hidden;
+            border-radius: 8px;
+            border: 1px solid rgba(200,168,75,0.5);
+        }
+        .card-back {
+            background: linear-gradient(160deg, #1a1208 0%, #0c0908 55%, #130f07 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotateY(0deg);
+            overflow: hidden;
+            position: absolute; inset: 0; backface-visibility: hidden;
+            border-radius: 8px; border: 1px solid rgba(196,162,74,0.5);
+        }
+        .card-back::after {
+            content: ''; position: absolute; inset: 0;
+            background: repeating-conic-gradient( rgba(196,162,74,0.04) 0deg, transparent 1deg, transparent 9deg, rgba(196,162,74,0.04) 10deg );
+            border-radius: 7px;
+        }
+        .card-back::before { content: ''; position: absolute; inset: 7px; border: 1px solid rgba(196,162,74,0.22); border-radius: 4px; z-index:1; }
+        .card-back-svg { width: 55%; height: auto; opacity: 0.75; z-index:2; position:relative; }
+
+        .intro-emblem {
+            width: 120px; height: 120px; margin-bottom: 24px; opacity: 0.85;
+            animation: emblemRotate 40s linear infinite;
+            filter: drop-shadow(0 0 14px rgba(196,162,74,0.35));
+        }
+        .intro-emblem-inner {
+            width: 72px; height: 72px;
+            position: absolute; top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            animation: emblemRotate 25s linear infinite reverse;
+            opacity: 0.7;
+        }
+        .emblem-wrap {
+            position: relative; width: 120px; height: 120px; margin-bottom: 24px;
+            display: flex; align-items: center; justify-content: center;
+        }
+        @keyframes emblemRotate { to { transform: rotate(360deg); } }
+
+        .ornament { color: var(--gold); opacity: 0.5; letter-spacing: 0.3em; font-size: 0.75rem; margin: 4px 0; }
+
+        .card-front {
+            background: var(--aged-parchment);
+            transform: rotateY(180deg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .card-front canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            z-index: 2;
+        }
+        .tarot-card.flipped .card-back  { transform: rotateY(180deg); }
+        .tarot-card.flipped .card-front { transform: rotateY(0deg); }
+        .tarot-card.drawn {
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s, transform 0.5s;
+            transform: translateX(var(--tx,0)) translateY(calc(var(--ty,0) + 80px)) rotate(var(--rot,0deg)) scale(0.4) !important;
+        }
+
+        /* 加载动画 */
+        .oracle-spinner { width: 90px; height: 90px; position: relative; }
+        .spinner-ring { position: absolute; inset: 0; border-radius: 50%; border: 1px solid rgba(200,168,75,0.15); }
+        .spinner-ring.outer { border-top-color: var(--gold); animation: spinSlow 4s linear infinite; }
+        .spinner-ring.inner { inset: 14px; border-top-color: var(--copper); border-right-color: rgba(184,115,51,0.3); animation: spinSlow 2.5s linear infinite reverse; }
+        .spinner-dot { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; font-size: 1.2rem; color: var(--gold); opacity: 0.6; animation: pulse 2s ease-in-out infinite; }
+        @keyframes spinSlow { to { transform: rotate(360deg); } }
+        @keyframes pulse { 0%,100%{opacity:0.3} 50%{opacity:0.8} }
+        .loading-text { margin-top: 2rem; font-family: var(--font-serif); font-style: italic; font-size: 1rem; letter-spacing: 0.3em; color: var(--copper-pale); opacity: 0.8; animation: pulse 3s ease-in-out infinite; }
+
+        /* 结果页 */
+        .result-scroll-content { width: 100%; max-width: 720px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; }
+        .result-cards-row { display: flex; gap: clamp(18px, 5vw, 2rem); justify-content: center; flex-wrap: wrap; margin: 20px 0 16px; width: 100%; }
+        .result-card-block { display: flex; flex-direction: column; align-items: center; gap: 12px; width: clamp(100px, 28vw, 128px); }
+        .result-card-frame {
+            width: 100%;
+            aspect-ratio: 2 / 3;
+            background: var(--aged-parchment);
+            border: 1px solid var(--copper);
+            border-radius: 8px;
+            padding: 0;
+            text-align: center;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8), 0 0 0 1px rgba(200,168,75,0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .result-card-frame::after { content: ''; position: absolute; inset: 0; border-radius: 7px; pointer-events: none; background: radial-gradient(circle at center, transparent 30%, rgba(45, 28, 15, 0.5) 130%); }
+        .result-card-frame canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            position: relative;
+            z-index: 1;
+        }
+        .result-position-tag {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            color: var(--copper-pale);
+            opacity: 0.9;
+        }
+
+        .oracle-scroll {
+            width: 100%;
+            max-width: 620px;
+            background: linear-gradient(160deg, rgba(30,22,12,0.85) 0%, rgba(20,14,8,0.95) 100%);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(200,168,75,0.35);
+            border-radius: 6px;
+            padding: clamp(24px, 6vw, 40px);
+            position: relative;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 1px 0 rgba(200,168,75,0.1);
+        }
+        .oracle-question { font-family: var(--font-serif); font-style: italic; font-size: 1rem; color: var(--gold-pale); letter-spacing: 0.08em; opacity: 0.9; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid rgba(200,168,75,0.15); line-height: 1.5; }
+        .oracle-body { font-family: 'IM Fell English', var(--font-serif); font-size: 1.05rem; line-height: 2; color: var(--parchment); text-align: justify; letter-spacing: 0.03em; }
+        .oracle-body p { margin-bottom: 1.2em; opacity: 0.9; }
+        .oracle-card-ref { color: var(--gold-bright); font-style: italic; font-weight: bold; text-shadow: 0 0 3px rgba(0,0,0,0.5); }
+        .oracle-signature { font-family: var(--font-serif); font-style: italic; font-size: 0.85rem; color: var(--copper-pale); opacity: 0.6; text-align: right; margin-top: 24px; padding-top: 16px; border-top: 1px solid rgba(200,168,75,0.1); letter-spacing: 0.1em; }
+        .oracle-loading-hint {
+            font-family: var(--font-serif); font-style: italic; font-size: 1rem;
+            color: var(--copper-pale); opacity: 0.6; letter-spacing: 0.2em;
+            text-align: center; animation: pulse 2.5s ease-in-out infinite;
+        }
+        .btn-group { transition: opacity 0.6s var(--ease-sacred); }
+
+        /* 复制提示浮层 */
+        .copy-toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.9);
+            background: rgba(8,6,8,0.88);
+            backdrop-filter: blur(16px);
+            border: 1px solid var(--gold);
+            border-radius: 40px;
+            padding: 12px 28px;
+            font-family: var(--font-serif);
+            font-style: italic;
+            letter-spacing: 0.15em;
+            font-size: 0.9rem;
+            color: var(--gold-pale);
+            box-shadow: 0 0 32px rgba(196,162,74,0.3), inset 0 1px 0 rgba(255,215,130,0.15);
+            z-index: 200;
+            opacity: 0;
+            transition: opacity 0.3s, transform 0.2s;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+        .copy-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+        @keyframes fadeUp {
+            from { opacity:0; transform: translateY(18px); }
+            to   { opacity:1; transform: translateY(0); }
+        }
+        #introView.active .title-cinzel   { animation: fadeUp 1.2s var(--ease-emerge) both; }
+        #introView.active .title-sub      { animation: fadeUp 1.2s var(--ease-emerge) 0.15s both; }
+        #introView.active .subtitle-italic{ animation: fadeUp 1.2s var(--ease-emerge) 0.25s both; }
+        #introView.active .divider        { animation: fadeUp 1.2s var(--ease-emerge) 0.4s both; }
+        #introView.active .sacred-btn     { animation: fadeUp 1.2s var(--ease-emerge) 0.55s both; }
+        #introView.active .emblem-wrap    { animation: fadeUp 1.4s var(--ease-emerge) both; }
+    </style>
+</head>
+<body>
+
+<canvas id="starfield"></canvas>
+<canvas id="floatingParticles"></canvas>
+
+<div class="bg-layer">
+    <div class="bg-cosmos"></div>
+    <div class="bg-nebula"></div>
+    <div class="bg-aureole"></div>
+    <div class="moving-light"></div>
+    <div class="bg-grain"></div>
+    <div class="bg-sigils"></div>
+</div>
+<div class="bg-vignette"></div>
+
+<div class="frame-edge top"></div>
+<div class="frame-edge bottom"></div>
+<div class="frame-edge-v left"></div>
+<div class="frame-edge-v right"></div>
+<div class="frame-corner tl"><svg viewBox="0 0 100 100" fill="none"><path d="M5 5 L5 55 M5 5 L55 5" stroke="#c4a24a" stroke-width="1.2" opacity="0.7"/><circle cx="5" cy="5" r="2.5" fill="#c4a24a" opacity="0.6"/></svg></div>
+<div class="frame-corner tr"><svg viewBox="0 0 100 100" fill="none"><path d="M5 5 L5 55 M5 5 L55 5" stroke="#c4a24a" stroke-width="1.2" opacity="0.7"/><circle cx="5" cy="5" r="2.5" fill="#c4a24a" opacity="0.6"/></svg></div>
+<div class="frame-corner bl"><svg viewBox="0 0 100 100" fill="none"><path d="M5 5 L5 55 M5 5 L55 5" stroke="#c4a24a" stroke-width="1.2" opacity="0.7"/><circle cx="5" cy="5" r="2.5" fill="#c4a24a" opacity="0.6"/></svg></div>
+<div class="frame-corner br"><svg viewBox="0 0 100 100" fill="none"><path d="M5 5 L5 55 M5 5 L55 5" stroke="#c4a24a" stroke-width="1.2" opacity="0.7"/><circle cx="5" cy="5" r="2.5" fill="#c4a24a" opacity="0.6"/></svg></div>
+
+<div id="introView" class="view active"><div class="emblem-wrap"><svg class="intro-emblem" viewBox="0 0 120 120"><circle cx="60" cy="60" r="54" stroke="#c4a24a" stroke-width="0.7" fill="none" opacity="0.55"/><circle cx="60" cy="60" r="42" stroke="#c4a24a" stroke-width="0.4" fill="none" opacity="0.35"/><polygon points="60,8 108,84 12,84" stroke="#c4a24a" stroke-width="0.6" fill="none" opacity="0.45"/><polygon points="60,112 12,36 108,36" stroke="#c4a24a" stroke-width="0.6" fill="none" opacity="0.45"/><circle cx="60" cy="8"  r="2.5" fill="#c4a24a" opacity="0.6"/><circle cx="108" cy="84" r="2.5" fill="#c4a24a" opacity="0.6"/><circle cx="12"  cy="84" r="2.5" fill="#c4a24a" opacity="0.6"/><circle cx="60" cy="112" r="2.5" fill="#c4a24a" opacity="0.6"/><circle cx="12" cy="36"  r="2.5" fill="#c4a24a" opacity="0.6"/><circle cx="108" cy="36" r="2.5" fill="#c4a24a" opacity="0.6"/></svg><svg class="intro-emblem-inner" viewBox="0 0 72 72"><circle cx="36" cy="36" r="28" stroke="#c4a24a" stroke-width="0.5" fill="none" opacity="0.5"/><circle cx="36" cy="36" r="16" stroke="#c4a24a" stroke-width="0.4" fill="none" opacity="0.35"/><line x1="36" y1="8"  x2="36" y2="64" stroke="#c4a24a" stroke-width="0.4" opacity="0.35"/><line x1="8"  y1="36" x2="64" y2="36" stroke="#c4a24a" stroke-width="0.4" opacity="0.35"/><line x1="15" y1="15" x2="57" y2="57" stroke="#c4a24a" stroke-width="0.35" opacity="0.25"/><line x1="57" y1="15" x2="15" y2="57" stroke="#c4a24a" stroke-width="0.35" opacity="0.25"/><circle cx="36" cy="36" r="4" stroke="#c4a24a" stroke-width="0.7" fill="rgba(196,162,74,0.15)" opacity="0.8"/><circle cx="36" cy="36" r="1.5" fill="#c4a24a" opacity="0.9"/></svg></div><div class="title-cinzel">雷诺曼</div><div class="title-sub">Lenormand Oracle</div><div class="subtitle-italic">神谕手札 · 灵境圣所</div><div class="divider" style="margin-top: 2.2rem; margin-bottom: 0.5rem;"><div class="divider-line"></div><div class="divider-glyph">✦ ✦ ✦</div><div class="divider-line"></div></div><p style="font-family:var(--font-serif);font-style:italic;font-size:clamp(0.8rem,2.5vw,0.95rem);color:var(--copper-pale);opacity:0.6;letter-spacing:0.12em;text-align:center;max-width:340px;line-height:2;">星盘印记，三十六张神圣映射<br>以牌为镜，照见时间之流</p><button class="sacred-btn" id="startBtn" style="margin-top:2.2rem;">开启问询</button></div>
+
+<div id="questionView" class="view"><div class="section-title">凝望星盘</div><div class="ornament" style="margin-top:8px;">· · ·</div><p style="font-family:var(--font-serif); font-style:italic; font-size:1rem; color:var(--copper-pale); opacity:0.8; margin-top:12px; letter-spacing:0.08em; text-align:center; max-width:360px; line-height:1.8;">静心片刻，将心中迷途化为言语，<br>牌灵方能应声而至。</p><div class="question-wrap"><label class="question-label">心中所问</label><textarea id="divineQuestion" class="question-input" placeholder="于此倾诉你的心念……" rows="1" autocomplete="off"></textarea><div class="question-error-msg" id="questionError">请先写下你的心念，牌灵方能感应。</div></div><button class="sacred-btn" id="confirmQuestionBtn" style="margin-top:2rem;">以心为引</button></div>
+
+<div id="drawView" class="view"><div class="draw-top"><div class="draw-guide">Select Your Cards</div><div class="draw-question-display" id="drawQuestionDisplay"></div></div><div class="deck-stage-wrap"><div id="ritualDeck" class="deck-stage"></div></div><div class="slots-section"><div class="draw-hint">凭直觉，依次择取三牌</div><div class="slots-row" id="slotContainer"><div class="slot" data-pos="0"><div class="slot-symbol">☽</div><div class="slot-label">缘起之牌</div></div><div class="slot" data-pos="1"><div class="slot-symbol">◈</div><div class="slot-label">枢转之牌</div></div><div class="slot" data-pos="2"><div class="slot-symbol">☉</div><div class="slot-label">示现之牌</div></div></div></div></div>
+
+<div id="loadingView" class="view"><div class="oracle-spinner"><div class="spinner-ring outer"></div><div class="spinner-ring inner"></div><div class="spinner-dot">✦</div></div><div class="loading-text">正在洗炼命运的序列...</div></div>
+
+<div id="resultView" class="view">
+    <div class="result-scroll-content">
+        <div class="section-title" style="text-align:center;">谕示回响</div><div class="ornament" style="text-align:center;">· · ·</div>
+        <div id="resultArtifacts" class="result-cards-row"></div>
+        <div class="divider"><div class="divider-line"></div><div class="divider-glyph">✦</div><div class="divider-line"></div></div>
+        <div class="oracle-scroll">
+            <div id="oracleQuestion" class="oracle-question"></div>
+            <div id="oracleBody" class="oracle-body"></div>
+        </div>
+        <div class="btn-group">
+            <button class="sacred-btn" id="redrawBtn">再启三牌</button>
+            <button class="sacred-btn" id="copyOracleBtn">✧ 铭刻谕示 ✧</button>
+            <button class="sacred-btn" id="restartRitual">归于初始</button>
+        </div>
+    </div>
+</div>
+
+<div id="copyToast" class="copy-toast">✦ 谕示已铭刻于剪贴板 ✦</div>
+
+<script>
+    // 星场粒子系统 (保持原有)
+    (function() {
+        const c = document.getElementById('starfield');
+        const ctx = c.getContext('2d');
+        let W, H, stars = [];
+        const N = 220;
+        function resize() { W = c.width = window.innerWidth; H = c.height = window.innerHeight; }
+        function mkStar() { const r = Math.random(); return { x: Math.random() * W, y: Math.random() * H, size: r < 0.7 ? Math.random() * 0.6 + 0.2 : r < 0.92 ? Math.random() * 1.0 + 0.5 : Math.random() * 1.8 + 0.8, baseAlpha: r < 0.7 ? Math.random() * 0.35 + 0.08 : r < 0.92 ? Math.random() * 0.5 + 0.2 : Math.random() * 0.65 + 0.35, hue: Math.random() < 0.4 ? 42 : Math.random() < 0.7 ? 38 : 0, sat: Math.random() < 0.4 ? Math.floor(Math.random()*30+10) : 0, twinkle: Math.random() * Math.PI * 2, twinkleSpeed: Math.random() * 0.018 + 0.005, drift: (Math.random() - 0.5) * 0.025 }; }
+        function init() { resize(); stars = Array.from({length:N}, mkStar); }
+        function tick() { ctx.clearRect(0,0,W,H); for (const s of stars) { s.twinkle += s.twinkleSpeed; s.x += s.drift; if (s.x < -2) s.x = W+2; if (s.x > W+2) s.x = -2; const alpha = s.baseAlpha * (0.6 + 0.4 * Math.sin(s.twinkle)); ctx.beginPath(); ctx.arc(s.x, s.y, s.size, 0, Math.PI*2); ctx.fillStyle = (s.sat > 0) ? `hsla(${s.hue},${s.sat}%,90%,${alpha})` : `rgba(240,232,210,${alpha})`; ctx.fill(); if (s.size > 1.8 && alpha > 0.7) { ctx.strokeStyle = `rgba(240,225,180,${alpha*0.25})`; ctx.lineWidth = 0.5; const len = s.size * 4; ctx.beginPath(); ctx.moveTo(s.x - len, s.y); ctx.lineTo(s.x + len, s.y); ctx.moveTo(s.x, s.y - len); ctx.lineTo(s.x, s.y + len); ctx.stroke(); } } requestAnimationFrame(tick); }
+        window.addEventListener('resize', () => { resize(); stars.forEach(s => { s.x *= W/c.width; s.y *= H/c.height; }); });
+        init(); tick();
+    })();
+    // 漂浮粒子 (原有)
+    (function() {
+        const canvas = document.getElementById('floatingParticles'); if (!canvas) return;
+        const ctx = canvas.getContext('2d'); let width, height, particles = []; const PARTICLE_COUNT = 110;
+        function resizeCanvas() { width = canvas.width = window.innerWidth; height = canvas.height = window.innerHeight; }
+        function randomRange(min,max){ return min + Math.random()*(max-min); }
+        function initParticles() { particles = []; for(let i=0;i<PARTICLE_COUNT;i++) { particles.push({ x: Math.random()*width, y: Math.random()*height, radius: randomRange(0.8,3.5), alpha: randomRange(0.1,0.55), speedX: randomRange(-0.12,0.12), speedY: randomRange(-0.08,0.08), flickerSpeed: randomRange(0.008,0.025), flickerPhase: Math.random()*Math.PI*2, colorGold: Math.random()>0.65 }); } }
+        function drawParticles() { if(!ctx) return; ctx.clearRect(0,0,width,height); for(let p of particles){ p.x+=p.speedX; p.y+=p.speedY; if(p.x<-20) p.x=width+20; if(p.x>width+20) p.x=-20; if(p.y<-20) p.y=height+20; if(p.y>height+20) p.y=-20; let flicker=0.55+0.45*Math.sin(p.flickerPhase); p.flickerPhase+=p.flickerSpeed; let finalAlpha=p.alpha*flicker; ctx.beginPath(); ctx.arc(p.x,p.y,p.radius,0,Math.PI*2); ctx.fillStyle = p.colorGold ? `rgba(226,187,92,${finalAlpha*0.9})` : `rgba(210,180,110,${finalAlpha*0.7})`; ctx.fill(); if(p.radius>2.2 && flicker>0.8){ ctx.shadowBlur=6; ctx.shadowColor="rgba(200,160,70,0.5)"; ctx.fill(); ctx.shadowBlur=0; } } requestAnimationFrame(drawParticles); }
+        window.addEventListener('resize', ()=>{ resizeCanvas(); initParticles(); });
+        resizeCanvas(); initParticles(); drawParticles();
+    })();
+
+    // ========== 雷诺曼核心业务 ==========
+    const LENORMAND_DECK = ["骑士","四叶草","船","房子","树","云","蛇","棺材","花束","镰刀","鞭子","鸟","小孩","狐狸","熊","星星","鹳","狗","塔","花园","山","十字路口","老鼠","心","戒指","书","信","男人","女人","百合","太阳","月亮","钥匙","鱼","锚","十字架"];
+    function generateCardSVG(cardName) { const symbolMap = { "骑士":"♞","四叶草":"☘","船":"⛵","房子":"⌂","树":"🌳","云":"☁","蛇":"☿","棺材":"☩","花束":"❋","镰刀":"⚔","鞭子":"⚡","鸟":"♅","小孩":"☽","狐狸":"⟁","熊":"♁","星星":"★","鹳":"♃","狗":"α","塔":"♄","花园":"✾","山":"△","十字路口":"✚","老鼠":"☾","心":"♡","戒指":"○","书":"☰","信":"✉","男人":"♂","女人":"♀","百合":"⚜","太阳":"☀","月亮":"☽","钥匙":"✝","鱼":"♓","锚":"⚓","十字架":"✞" }; const numMap = { "骑士":1,"四叶草":2,"船":3,"房子":4,"树":5,"云":6,"蛇":7,"棺材":8,"花束":9,"镰刀":10,"鞭子":11,"鸟":12,"小孩":13,"狐狸":14,"熊":15,"星星":16,"鹳":17,"狗":18,"塔":19,"花园":20,"山":21,"十字路口":22,"老鼠":23,"心":24,"戒指":25,"书":26,"信":27,"男人":28,"女人":29,"百合":30,"太阳":31,"月亮":32,"钥匙":33,"鱼":34,"锚":35,"十字架":36 }; const symbol = symbolMap[cardName]||"✦"; const cardNum = numMap[cardName]||0; const numStr = cardNum>0?String(cardNum).padStart(2,'0'):''; const svgString = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 560" width="400" height="560"><defs><radialGradient id="bg${cardNum}" cx="50%" cy="45%" r="60%"><stop offset="0%" stop-color="#f2e8cc"/><stop offset="60%" stop-color="#dfc69a"/><stop offset="100%" stop-color="#c8ab7a"/></radialGradient><radialGradient id="glow${cardNum}" cx="50%" cy="40%" r="45%"><stop offset="0%" stop-color="#f8f0e0" stop-opacity="0.7"/><stop offset="100%" stop-color="#dfc69a" stop-opacity="0"/></radialGradient><filter id="noise${cardNum}" x="0%" y="0%" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" result="noise"/><feColorMatrix type="saturate" values="0" in="noise" result="gn"/><feBlend in="SourceGraphic" in2="gn" mode="multiply" result="out"/><feComponentTransfer in="out"><feFuncA type="linear" slope="1"/></feComponentTransfer></filter></defs><rect width="400" height="560" rx="14" fill="url(#bg${cardNum})" filter="url(#noise${cardNum})"/><rect width="400" height="560" rx="14" fill="url(#glow${cardNum})"/><rect x="10" y="10" width="380" height="540" rx="10" fill="none" stroke="#8a6430" stroke-width="1.5" opacity="0.55"/><rect x="18" y="18" width="364" height="524" rx="8" fill="none" stroke="#c4a24a" stroke-width="0.8" opacity="0.45"/><rect x="24" y="24" width="352" height="512" rx="6" fill="none" stroke="#c4a24a" stroke-width="0.4" opacity="0.25"/><g opacity="0.5" stroke="#8a6430" stroke-width="0.8" fill="none"><path d="M28,28 L28,50 M28,28 L50,28"/><path d="M372,28 L372,50 M372,28 L350,28"/><path d="M28,532 L28,510 M28,532 L50,532"/><path d="M372,532 L372,510 M372,532 L350,532"/></g><g opacity="0.35" fill="#c4a24a"><circle cx="28" cy="28" r="2.5"/><circle cx="372" cy="28" r="2.5"/><circle cx="28" cy="532" r="2.5"/><circle cx="372" cy="532" r="2.5"/></g><text x="36" y="60" font-family="'Cinzel',serif" font-size="20" fill="#6a4820" opacity="0.6" font-weight="400">${numStr}</text><line x1="36" y1="72" x2="364" y2="72" stroke="#c4a24a" stroke-width="0.6" opacity="0.35"/><circle cx="200" cy="72" r="2.5" fill="#c4a24a" opacity="0.4"/><circle cx="36" cy="72" r="1.5" fill="#c4a24a" opacity="0.3"/><circle cx="364" cy="72" r="1.5" fill="#c4a24a" opacity="0.3"/><text x="200" y="310" font-family="'Cinzel','Noto Serif SC',serif" font-size="140" fill="#3e2410" text-anchor="middle" dominant-baseline="middle" opacity="0.82">${symbol}</text><line x1="36" y1="390" x2="364" y2="390" stroke="#c4a24a" stroke-width="0.6" opacity="0.35"/><circle cx="200" cy="390" r="2.5" fill="#c4a24a" opacity="0.4"/><polygon points="200,405 212,418 200,431 188,418" fill="none" stroke="#c4a24a" stroke-width="0.7" opacity="0.4"/><circle cx="200" cy="418" r="2" fill="#c4a24a" opacity="0.35"/><text x="200" y="468" font-family="'Cormorant Garamond','Noto Serif SC',serif" font-size="38" font-weight="600" fill="#3e2410" text-anchor="middle" letter-spacing="5" opacity="0.88">${cardName}</text><line x1="110" y1="494" x2="290" y2="494" stroke="#8a6430" stroke-width="0.7" opacity="0.4"/><circle cx="200" cy="494" r="2.5" fill="#c4a24a" opacity="0.4"/><line x1="140" y1="507" x2="260" y2="507" stroke="#c4a24a" stroke-width="0.4" opacity="0.25"/></svg>`; return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgString)))}`; }
+    const imageCache = new Map(); function preloadAllCards(){ for(const name of LENORMAND_DECK){ const url=generateCardSVG(name); const img=new Image(); img.src=url; imageCache.set(name,{url,img}); } }
+    function drawCard(canvas, cardName){ const ctx=canvas.getContext('2d'); const tw=canvas.width, th=canvas.height; let ce=imageCache.get(cardName); if(!ce){ const url=generateCardSVG(cardName); const img=new Image(); img.src=url; ce={url,img}; imageCache.set(cardName,ce); } const img=ce.img; if(img.complete && img.naturalWidth>0){ ctx.clearRect(0,0,tw,th); ctx.drawImage(img,0,0,tw,th); } else { ctx.fillStyle='#e8d9b8'; ctx.fillRect(0,0,tw,th); ctx.fillStyle='#7a5535'; ctx.font='bold 20px "Cinzel", serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(cardName,tw/2,th/2); img.onload=()=>{ ctx.clearRect(0,0,tw,th); ctx.drawImage(img,0,0,tw,th); }; } }
+    function makeCardBackSVG(){ const el = document.createElementNS('http://www.w3.org/2000/svg','svg'); el.setAttribute('viewBox','0 0 60 60'); el.setAttribute('class','card-back-svg'); el.innerHTML = `<circle cx="30" cy="30" r="26" stroke="#c4a24a" stroke-width="0.7" fill="none" opacity="0.55"/><circle cx="30" cy="30" r="18" stroke="#c4a24a" stroke-width="0.5" fill="none" opacity="0.4"/><circle cx="30" cy="30" r="10" stroke="#c4a24a" stroke-width="0.4" fill="none" opacity="0.3"/><polygon points="30,4 52,43 8,43" stroke="#c4a24a" stroke-width="0.6" fill="none" opacity="0.45"/><polygon points="30,56 8,17 52,17" stroke="#c4a24a" stroke-width="0.6" fill="none" opacity="0.45"/><line x1="30" y1="4" x2="30" y2="56" stroke="#c4a24a" stroke-width="0.35" opacity="0.3"/><line x1="4" y1="30" x2="56" y2="30" stroke="#c4a24a" stroke-width="0.35" opacity="0.3"/><line x1="10" y1="10" x2="50" y2="50" stroke="#c4a24a" stroke-width="0.3" opacity="0.2"/><line x1="50" y1="10" x2="10" y2="50" stroke="#c4a24a" stroke-width="0.3" opacity="0.2"/><circle cx="30" cy="30" r="3" fill="rgba(196,162,74,0.25)" stroke="#c4a24a" stroke-width="0.5" opacity="0.7"/><circle cx="30" cy="30" r="1" fill="#c4a24a" opacity="0.8"/><circle cx="30" cy="4" r="1.5" fill="#c4a24a" opacity="0.5"/><circle cx="30" cy="56" r="1.5" fill="#c4a24a" opacity="0.5"/><circle cx="4" cy="30" r="1.5" fill="#c4a24a" opacity="0.5"/><circle cx="56" cy="30" r="1.5" fill="#c4a24a" opacity="0.5"/>`; return el; }
+    let shuffledCards=[], drawnIndices=[], drawnCardsData=[], currentQuestion="", slotsEls=[];
+    function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+    function setView(id){ document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+    function resetSlotsToEmpty(){ const symbols=['☽','◈','☉']; const labels=['缘起之牌','枢转之牌','示现之牌']; slotsEls.forEach((slot,idx)=>{ slot.classList.remove('filled'); slot.innerHTML=`<div class="slot-symbol">${symbols[idx]}</div><div class="slot-label">${labels[idx]}</div>`; }); }
+    function initDeck(){ const stage=document.getElementById('ritualDeck'); stage.innerHTML=''; shuffledCards=[]; drawnIndices=[]; drawnCardsData=[]; const names=shuffle(LENORMAND_DECK); const total=names.length; const isMobile=window.innerWidth<600; const spread=isMobile?58:48; const step=(spread*2)/(total-1); const rX=isMobile?Math.min(window.innerWidth*0.55,320):420; const rY=isMobile?100:170; names.forEach((name,i)=>{ const wrapper=document.createElement('div'); wrapper.className='tarot-card'; const back=document.createElement('div'); back.className='card-back'; back.appendChild(makeCardBackSVG()); const front=document.createElement('div'); front.className='card-front'; const cvs=document.createElement('canvas'); cvs.className='card-canvas'; cvs.width=300; cvs.height=464; drawCard(cvs,name); front.appendChild(cvs); wrapper.appendChild(back); wrapper.appendChild(front); const angleDeg=-spread+i*step; const rad=angleDeg*Math.PI/180; const tx=Math.sin(rad)*rX; const ty=-Math.cos(rad)*rY+(isMobile?10:5); const rot=angleDeg*0.7; wrapper.style.setProperty('--tx',tx+'px'); wrapper.style.setProperty('--ty',ty+'px'); wrapper.style.setProperty('--rot',rot+'deg'); wrapper.style.left=`calc(50% - ${parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-w'))/2}px)`; wrapper.style.top='48%'; const cardData={name,element:wrapper,drawn:false,index:i}; shuffledCards.push(cardData); wrapper.addEventListener('click',e=>{ e.stopPropagation(); if(drawnIndices.length>=3||cardData.drawn) return; performDraw(cardData); }); stage.appendChild(wrapper); }); resetSlotsToEmpty(); }
+    function performDraw(cardData){ if(drawnIndices.length>=3) return; const pos=drawnIndices.length; cardData.drawn=true; cardData.element.classList.add('flipped'); drawnIndices.push(cardData.index); drawnCardsData.push({name:cardData.name,position:pos}); const slot=slotsEls[pos]; slot.classList.add('filled'); const mini=document.createElement('canvas'); mini.width=200; mini.height=280; drawCard(mini,cardData.name); slot.innerHTML=''; slot.appendChild(mini); setTimeout(()=>{ cardData.element.classList.add('drawn'); cardData.element.style.pointerEvents='none'; },500); if(drawnIndices.length===3){ setTimeout(()=>{ setView('loadingView'); setTimeout(showResult,1800); },800); } }
+    const API_BASE='https://your-app.onrender.com';
+    function createTypewriter(targetEl){ let queue=[], currentPara=null, buffer='', running=false, onDoneCallback=null, isDone=false; function newPara(){ currentPara=document.createElement('p'); currentPara.style.opacity='0'; currentPara.style.transition='opacity 0.4s'; targetEl.appendChild(currentPara); requestAnimationFrame(()=>{ currentPara.style.opacity='1'; }); buffer=''; } function tick(){ if(queue.length===0){ running=false; if(isDone && onDoneCallback) onDoneCallback(); return; } const ch=queue.shift(); if(ch==='\n'){ if(buffer.trim()) newPara(); } else { buffer+=ch; if(currentPara) currentPara.innerHTML=formatOracleText(buffer); } const delay=/[\u4e00-\u9fa5]/.test(ch)?38:18; setTimeout(tick,delay); } function push(text){ for(const ch of text) queue.push(ch); if(!running){ running=true; tick(); } } function finish(cb){ isDone=true; onDoneCallback=cb; if(!running && cb) cb(); } newPara(); return {push,finish}; }
+    function formatOracleText(text){ return text.replace(/【([^】]+)】/g,'<span class="oracle-card-ref">【$1】</span>').replace(/「([^」]+)」/g,'<em style="color:var(--gold-pale);opacity:0.9;">「$1」</em>'); }
+    async function fetchOracleStream(question,cards,targetEl){ targetEl.innerHTML=''; const typewriter=createTypewriter(targetEl); const response=await fetch(`${API_BASE}/oracle`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question,cards})}); if(!response.ok){ const errText=await response.text().catch(()=>''); throw new Error(`HTTP ${response.status}${errText?': '+errText:''}`); } const reader=response.body.getReader(); const decoder=new TextDecoder('utf-8'); let sseBuffer=''; return new Promise((resolve,reject)=>{ function read(){ reader.read().then(({done,value})=>{ if(done){ typewriter.finish(resolve); return; } sseBuffer+=decoder.decode(value,{stream:true}); const parts=sseBuffer.split('\n\n'); sseBuffer=parts.pop(); for(const part of parts){ for(const line of part.split('\n')){ if(!line.startsWith('data: ')) continue; const raw=line.slice(6).trim(); if(raw==='[DONE]'){ typewriter.finish(resolve); return; } let obj; try{ obj=JSON.parse(raw); }catch{ continue; } if(obj.error){ reject(new Error(obj.error)); return; } if(obj.text){ typewriter.push(obj.text); } } } read(); }).catch(reject); } read(); }); }
+    const POSITIONS=['缘起之牌','枢转之牌','示现之牌'];
+    const CARD_MEANINGS={"骑士":"信息传递，行动在即","四叶草":"小幸运，意外喜悦","船":"远行，渴望远方","房子":"家庭，根基","树":"健康，成长","云":"疑惑，未清晰","蛇":"复杂，智慧的弯路","棺材":"终结，转化","花束":"礼物，惊喜","镰刀":"决断，果断切断","鞭子":"争论，摩擦","鸟":"焦虑，对话","小孩":"新生，初始","狐狸":"机敏，自保","熊":"权威，力量","星星":"希望，指引","鹳":"改变，转折","狗":"忠诚，信赖","塔":"孤独，边界","花园":"社交，人群","山":"阻碍，耐心","十字路口":"选择，分叉","老鼠":"损耗，焦虑","心":"爱，情感","戒指":"承诺，契约","书":"秘密，学习","信":"消息，文字","男人":"男性能量","女人":"女性能量","百合":"纯洁，平静","太阳":"成功，活力","月亮":"直觉，梦境","钥匙":"解答，机遇","鱼":"财富，流动","锚":"稳定，目标","十字架":"命运，承担"};
+    function getFallbackReading(cards){ const [a,b,c]=cards.map(x=>x.name); return `<span class="oracle-card-ref">【${a}】</span>——${CARD_MEANINGS[a]||'此牌之意，需结合全局体悟'}。往昔脉络如根，滋养此刻。<br><br><span class="oracle-card-ref">【${b}】</span>——${CARD_MEANINGS[b]||'此牌之意，需结合全局体悟'}。当下之镜映照真实。<br><br><span class="oracle-card-ref">【${c}】</span>——${CARD_MEANINGS[c]||'此牌之意，需结合全局体悟'}。未来之种已埋入季节。`; }
+    function showResult(){
+        // 先移除所有旧的签名元素，防止重复
+        const scrollDiv = document.querySelector('.oracle-scroll');
+        if (scrollDiv) {
+            scrollDiv.querySelectorAll('.oracle-signature').forEach(el => el.remove());
+        }
+        setView('resultView');
+        document.getElementById('resultView').scrollTop=0;
+        const panel=document.getElementById('resultArtifacts');
+        panel.innerHTML='';
+        drawnCardsData.forEach((card,idx)=>{
+            const block=document.createElement('div');
+            block.className='result-card-block';
+            block.style.opacity='0';
+            block.style.transform='translateY(20px)';
+            block.style.transition=`opacity 0.7s ${idx*0.18}s var(--ease-emerge), transform 0.7s ${idx*0.18}s var(--ease-emerge)`;
+            const frame=document.createElement('div');
+            frame.className='result-card-frame';
+            const cvs=document.createElement('canvas');
+            cvs.width=200;
+            cvs.height=300;
+            drawCard(cvs,card.name);
+            frame.appendChild(cvs);
+            const pos=document.createElement('div');
+            pos.className='result-position-tag';
+            pos.textContent=POSITIONS[idx];
+            block.appendChild(frame);
+            block.appendChild(pos);
+            panel.appendChild(block);
+            requestAnimationFrame(()=>{
+                setTimeout(()=>{
+                    block.style.opacity='1';
+                    block.style.transform='translateY(0)';
+                },50+idx*180);
+            });
+        });
+        document.getElementById('oracleQuestion').textContent=`「${currentQuestion||'无言之问'}」`;
+        const bodyEl=document.getElementById('oracleBody');
+        bodyEl.innerHTML='<p class="oracle-loading-hint">牌灵正在感应，稍候…</p>';
+        const cards=drawnCardsData.map((c,i)=>({name:c.name,position:POSITIONS[i]}));
+        fetchOracleStream(currentQuestion,cards,bodyEl).then(()=>{
+            // 再次确保移除可能残留的旧签名（防止极少数异步竞争）
+            if (scrollDiv) {
+                scrollDiv.querySelectorAll('.oracle-signature').forEach(el => el.remove());
+            }
+            const sign=document.createElement('div');
+            sign.className='oracle-signature';
+            sign.style.opacity='0';
+            sign.style.transition='opacity 1s 0.5s';
+            sign.textContent='— 雷诺曼神谕手札';
+            bodyEl.parentElement.appendChild(sign);
+            requestAnimationFrame(()=>{
+                sign.style.opacity='1';
+            });
+            document.querySelector('.btn-group').style.opacity='1';
+            document.querySelector('.btn-group').style.pointerEvents='auto';
+        }).catch(err=>{
+            console.error('Oracle API error:',err);
+            // 同样先清理旧签名，再写入 fallback 内容（fallback 自身已包含签名）
+            if (scrollDiv) {
+                scrollDiv.querySelectorAll('.oracle-signature').forEach(el => el.remove());
+            }
+            bodyEl.innerHTML=`<p style="color:var(--copper-pale);opacity:0.8;">星象感应出现了扰动，牌灵暂时无法应答。<br><span style="font-size:0.85em;opacity:0.6;">(${err.message||'网络连接异常，请检查后端服务是否启动'})</span></p><p style="margin-top:1.2em;">${getFallbackReading(drawnCardsData)}</p><div class="oracle-signature" style="margin-top:24px;">— 雷诺曼神谕手札</div>`;
+            document.querySelector('.btn-group').style.opacity='1';
+            document.querySelector('.btn-group').style.pointerEvents='auto';
+        });
+        document.querySelector('.btn-group').style.opacity='0';
+        document.querySelector('.btn-group').style.pointerEvents='none';
+    }
+    function fullReset(){ shuffledCards=[]; drawnIndices=[]; drawnCardsData=[]; currentQuestion=""; const divineInput=document.getElementById('divineQuestion'); divineInput.value=''; divineInput.style.height='auto'; resetSlotsToEmpty(); setView('introView'); }
+    function redrawCards(){ if(!currentQuestion){ setView('questionView'); return; } shuffledCards=[]; drawnIndices=[]; drawnCardsData=[]; const stage=document.getElementById('ritualDeck'); stage.innerHTML=''; resetSlotsToEmpty(); initDeck(); document.getElementById('drawQuestionDisplay').textContent=currentQuestion; setView('drawView'); }
+    function showCopyToast(msg){ const toast=document.getElementById('copyToast'); if(!toast) return; toast.textContent=msg||'✦ 谕示已铭刻于剪贴板 ✦'; toast.classList.add('show'); setTimeout(()=>{ toast.classList.remove('show'); },2200); }
+    async function copyOracleHandler(){ const bodyEl=document.getElementById('oracleBody'); if(bodyEl.querySelector('.oracle-loading-hint')){ showCopyToast('✦ 神谕凝聚中，稍后再试 ✦'); return; } const oracleScroll=document.querySelector('.oracle-scroll'); if(!oracleScroll) return; let interpretationText=''; const bodyClone=bodyEl.cloneNode(true); bodyClone.querySelectorAll('.oracle-card-ref, em').forEach(el=>{ const span=document.createElement('span'); span.textContent=el.textContent; el.parentNode.replaceChild(span,el); }); interpretationText=bodyClone.innerText.trim(); const signatureElem=document.querySelector('.oracle-signature'); const signature=signatureElem?signatureElem.innerText.trim():''; const questionText=document.getElementById('oracleQuestion')?.innerText||`「${currentQuestion||'无言之问'}」`; const cardsText=drawnCardsData.map((card,idx)=>`${POSITIONS[idx]}：【${card.name}】`).join('\n'); const copyContent=`【灵境·雷诺曼神谕手札】\n\n问卜之念：${questionText.replace(/^「|」$/g,'')}\n\n抽得牌阵：\n${cardsText}\n\n神谕回响：\n${interpretationText}\n${signature?`\n${signature}`:'— 雷诺曼神谕手札'}\n\n—— 谕示抄录于星历 ——`; try{ await navigator.clipboard.writeText(copyContent); showCopyToast('✦ 谕示已铭刻于剪贴板 ✦'); }catch(err){ showCopyToast('❄ 铭刻失败，可手动摘录'); console.warn(err); } }
+    document.getElementById('startBtn').onclick=()=>setView('questionView');
+    const divineInput=document.getElementById('divineQuestion'); divineInput.addEventListener('input',function(){ this.style.height='auto'; this.style.height=this.scrollHeight+'px'; const err=document.getElementById('questionError'); if(err.classList.contains('visible')) err.classList.remove('visible'); });
+    divineInput.addEventListener('keydown',(e)=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); document.getElementById('confirmQuestionBtn').click(); } });
+    document.getElementById('confirmQuestionBtn').onclick=()=>{ const inp=document.getElementById('divineQuestion'); const err=document.getElementById('questionError'); const val=inp.value.trim(); if(!val){ err.classList.add('visible'); inp.focus(); return; } currentQuestion=val; document.getElementById('drawQuestionDisplay').textContent=currentQuestion; setView('drawView'); initDeck(); };
+    document.getElementById('redrawBtn').onclick=redrawCards;
+    document.getElementById('restartRitual').onclick=fullReset;
+    document.getElementById('copyOracleBtn').onclick=copyOracleHandler;
+    window.addEventListener('resize',()=>{ if(document.getElementById('drawView').classList.contains('active') && drawnIndices.length===0) initDeck(); });
+    window.onload=()=>{ slotsEls=Array.from(document.querySelectorAll('.slot')); preloadAllCards(); };
+</script>
+</body>
+</html>
