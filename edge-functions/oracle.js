@@ -333,7 +333,7 @@ export async function onRequestPost(context) {
           "Authorization": `Bearer ${apiKey}`,
         },
         body: JSON.stringify({
-          model: "qwen-plus",
+          model: "qwen-turbo",
           stream: true,
           max_tokens: 800,
           temperature: 0.88,
