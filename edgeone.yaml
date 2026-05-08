@@ -1,0 +1,4 @@
+name: lenormand-oracle
+functions:
+  - path: /
+    handler: app.app  # 对应 app.py 中的 Flask 实例变量名
