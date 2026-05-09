@@ -621,107 +621,260 @@
         resizeCanvas(); initParticles(); drawParticles();
     })();
 
-    // ========== 雷诺曼核心业务 ==========
-    const LENORMAND_DECK = ["骑士","四叶草","船","房子","树","云","蛇","棺材","花束","镰刀","鞭子","鸟","小孩","狐狸","熊","星星","鹳","狗","塔","花园","山","十字路口","老鼠","心","戒指","书","信","男人","女人","百合","太阳","月亮","钥匙","鱼","锚","十字架"];
-    function generateCardSVG(cardName) { const symbolMap = { "骑士":"♞","四叶草":"☘","船":"⛵","房子":"⌂","树":"🌳","云":"☁","蛇":"☿","棺材":"☩","花束":"❋","镰刀":"⚔","鞭子":"⚡","鸟":"♅","小孩":"☽","狐狸":"⟁","熊":"♁","星星":"★","鹳":"♃","狗":"α","塔":"♄","花园":"✾","山":"△","十字路口":"✚","老鼠":"☾","心":"♡","戒指":"○","书":"☰","信":"✉","男人":"♂","女人":"♀","百合":"⚜","太阳":"☀","月亮":"☽","钥匙":"✝","鱼":"♓","锚":"⚓","十字架":"✞" }; const numMap = { "骑士":1,"四叶草":2,"船":3,"房子":4,"树":5,"云":6,"蛇":7,"棺材":8,"花束":9,"镰刀":10,"鞭子":11,"鸟":12,"小孩":13,"狐狸":14,"熊":15,"星星":16,"鹳":17,"狗":18,"塔":19,"花园":20,"山":21,"十字路口":22,"老鼠":23,"心":24,"戒指":25,"书":26,"信":27,"男人":28,"女人":29,"百合":30,"太阳":31,"月亮":32,"钥匙":33,"鱼":34,"锚":35,"十字架":36 }; const symbol = symbolMap[cardName]||"✦"; const cardNum = numMap[cardName]||0; const numStr = cardNum>0?String(cardNum).padStart(2,'0'):''; const svgString = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 560" width="400" height="560"><defs><radialGradient id="bg${cardNum}" cx="50%" cy="45%" r="60%"><stop offset="0%" stop-color="#f2e8cc"/><stop offset="60%" stop-color="#dfc69a"/><stop offset="100%" stop-color="#c8ab7a"/></radialGradient><radialGradient id="glow${cardNum}" cx="50%" cy="40%" r="45%"><stop offset="0%" stop-color="#f8f0e0" stop-opacity="0.7"/><stop offset="100%" stop-color="#dfc69a" stop-opacity="0"/></radialGradient><filter id="noise${cardNum}" x="0%" y="0%" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" result="noise"/><feColorMatrix type="saturate" values="0" in="noise" result="gn"/><feBlend in="SourceGraphic" in2="gn" mode="multiply" result="out"/><feComponentTransfer in="out"><feFuncA type="linear" slope="1"/></feComponentTransfer></filter></defs><rect width="400" height="560" rx="14" fill="url(#bg${cardNum})" filter="url(#noise${cardNum})"/><rect width="400" height="560" rx="14" fill="url(#glow${cardNum})"/><rect x="10" y="10" width="380" height="540" rx="10" fill="none" stroke="#8a6430" stroke-width="1.5" opacity="0.55"/><rect x="18" y="18" width="364" height="524" rx="8" fill="none" stroke="#c4a24a" stroke-width="0.8" opacity="0.45"/><rect x="24" y="24" width="352" height="512" rx="6" fill="none" stroke="#c4a24a" stroke-width="0.4" opacity="0.25"/><g opacity="0.5" stroke="#8a6430" stroke-width="0.8" fill="none"><path d="M28,28 L28,50 M28,28 L50,28"/><path d="M372,28 L372,50 M372,28 L350,28"/><path d="M28,532 L28,510 M28,532 L50,532"/><path d="M372,532 L372,510 M372,532 L350,532"/></g><g opacity="0.35" fill="#c4a24a"><circle cx="28" cy="28" r="2.5"/><circle cx="372" cy="28" r="2.5"/><circle cx="28" cy="532" r="2.5"/><circle cx="372" cy="532" r="2.5"/></g><text x="36" y="60" font-family="'Cinzel',serif" font-size="20" fill="#6a4820" opacity="0.6" font-weight="400">${numStr}</text><line x1="36" y1="72" x2="364" y2="72" stroke="#c4a24a" stroke-width="0.6" opacity="0.35"/><circle cx="200" cy="72" r="2.5" fill="#c4a24a" opacity="0.4"/><circle cx="36" cy="72" r="1.5" fill="#c4a24a" opacity="0.3"/><circle cx="364" cy="72" r="1.5" fill="#c4a24a" opacity="0.3"/><text x="200" y="310" font-family="'Cinzel','Noto Serif SC',serif" font-size="140" fill="#3e2410" text-anchor="middle" dominant-baseline="middle" opacity="0.82">${symbol}</text><line x1="36" y1="390" x2="364" y2="390" stroke="#c4a24a" stroke-width="0.6" opacity="0.35"/><circle cx="200" cy="390" r="2.5" fill="#c4a24a" opacity="0.4"/><polygon points="200,405 212,418 200,431 188,418" fill="none" stroke="#c4a24a" stroke-width="0.7" opacity="0.4"/><circle cx="200" cy="418" r="2" fill="#c4a24a" opacity="0.35"/><text x="200" y="468" font-family="'Cormorant Garamond','Noto Serif SC',serif" font-size="38" font-weight="600" fill="#3e2410" text-anchor="middle" letter-spacing="5" opacity="0.88">${cardName}</text><line x1="110" y1="494" x2="290" y2="494" stroke="#8a6430" stroke-width="0.7" opacity="0.4"/><circle cx="200" cy="494" r="2.5" fill="#c4a24a" opacity="0.4"/><line x1="140" y1="507" x2="260" y2="507" stroke="#c4a24a" stroke-width="0.4" opacity="0.25"/></svg>`; return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgString)))}`; }
-    const imageCache = new Map(); function preloadAllCards(){ for(const name of LENORMAND_DECK){ const url=generateCardSVG(name); const img=new Image(); img.src=url; imageCache.set(name,{url,img}); } }
-    function drawCard(canvas, cardName){ const ctx=canvas.getContext('2d'); const tw=canvas.width, th=canvas.height; let ce=imageCache.get(cardName); if(!ce){ const url=generateCardSVG(cardName); const img=new Image(); img.src=url; ce={url,img}; imageCache.set(cardName,ce); } const img=ce.img; if(img.complete && img.naturalWidth>0){ ctx.clearRect(0,0,tw,th); ctx.drawImage(img,0,0,tw,th); } else { ctx.fillStyle='#e8d9b8'; ctx.fillRect(0,0,tw,th); ctx.fillStyle='#7a5535'; ctx.font='bold 20px "Cinzel", serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(cardName,tw/2,th/2); img.onload=()=>{ ctx.clearRect(0,0,tw,th); ctx.drawImage(img,0,0,tw,th); }; } }
-    function makeCardBackSVG(){ const el = document.createElementNS('http://www.w3.org/2000/svg','svg'); el.setAttribute('viewBox','0 0 60 60'); el.setAttribute('class','card-back-svg'); el.innerHTML = `<circle cx="30" cy="30" r="26" stroke="#c4a24a" stroke-width="0.7" fill="none" opacity="0.55"/><circle cx="30" cy="30" r="18" stroke="#c4a24a" stroke-width="0.5" fill="none" opacity="0.4"/><circle cx="30" cy="30" r="10" stroke="#c4a24a" stroke-width="0.4" fill="none" opacity="0.3"/><polygon points="30,4 52,43 8,43" stroke="#c4a24a" stroke-width="0.6" fill="none" opacity="0.45"/><polygon points="30,56 8,17 52,17" stroke="#c4a24a" stroke-width="0.6" fill="none" opacity="0.45"/><line x1="30" y1="4" x2="30" y2="56" stroke="#c4a24a" stroke-width="0.35" opacity="0.3"/><line x1="4" y1="30" x2="56" y2="30" stroke="#c4a24a" stroke-width="0.35" opacity="0.3"/><line x1="10" y1="10" x2="50" y2="50" stroke="#c4a24a" stroke-width="0.3" opacity="0.2"/><line x1="50" y1="10" x2="10" y2="50" stroke="#c4a24a" stroke-width="0.3" opacity="0.2"/><circle cx="30" cy="30" r="3" fill="rgba(196,162,74,0.25)" stroke="#c4a24a" stroke-width="0.5" opacity="0.7"/><circle cx="30" cy="30" r="1" fill="#c4a24a" opacity="0.8"/><circle cx="30" cy="4" r="1.5" fill="#c4a24a" opacity="0.5"/><circle cx="30" cy="56" r="1.5" fill="#c4a24a" opacity="0.5"/><circle cx="4" cy="30" r="1.5" fill="#c4a24a" opacity="0.5"/><circle cx="56" cy="30" r="1.5" fill="#c4a24a" opacity="0.5"/>`; return el; }
-    let shuffledCards=[], drawnIndices=[], drawnCardsData=[], currentQuestion="", slotsEls=[];
-    function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
-    function setView(id){ document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.getElementById(id).classList.add('active'); }
-    function resetSlotsToEmpty(){ const symbols=['☽','◈','☉']; const labels=['缘起之牌','枢转之牌','示现之牌']; slotsEls.forEach((slot,idx)=>{ slot.classList.remove('filled'); slot.innerHTML=`<div class="slot-symbol">${symbols[idx]}</div><div class="slot-label">${labels[idx]}</div>`; }); }
-    function initDeck(){ const stage=document.getElementById('ritualDeck'); stage.innerHTML=''; shuffledCards=[]; drawnIndices=[]; drawnCardsData=[]; const names=shuffle(LENORMAND_DECK); const total=names.length; const isMobile=window.innerWidth<600; const spread=isMobile?58:48; const step=(spread*2)/(total-1); const rX=isMobile?Math.min(window.innerWidth*0.55,320):420; const rY=isMobile?100:170; names.forEach((name,i)=>{ const wrapper=document.createElement('div'); wrapper.className='tarot-card'; const back=document.createElement('div'); back.className='card-back'; back.appendChild(makeCardBackSVG()); const front=document.createElement('div'); front.className='card-front'; const cvs=document.createElement('canvas'); cvs.className='card-canvas'; cvs.width=300; cvs.height=464; drawCard(cvs,name); front.appendChild(cvs); wrapper.appendChild(back); wrapper.appendChild(front); const angleDeg=-spread+i*step; const rad=angleDeg*Math.PI/180; const tx=Math.sin(rad)*rX; const ty=-Math.cos(rad)*rY+(isMobile?10:5); const rot=angleDeg*0.7; wrapper.style.setProperty('--tx',tx+'px'); wrapper.style.setProperty('--ty',ty+'px'); wrapper.style.setProperty('--rot',rot+'deg'); wrapper.style.left=`calc(50% - ${parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-w'))/2}px)`; wrapper.style.top='48%'; const cardData={name,element:wrapper,drawn:false,index:i}; shuffledCards.push(cardData); wrapper.addEventListener('click',e=>{ e.stopPropagation(); if(drawnIndices.length>=3||cardData.drawn) return; performDraw(cardData); }); stage.appendChild(wrapper); }); resetSlotsToEmpty(); }
-    function performDraw(cardData){ if(drawnIndices.length>=3) return; const pos=drawnIndices.length; cardData.drawn=true; cardData.element.classList.add('flipped'); drawnIndices.push(cardData.index); drawnCardsData.push({name:cardData.name,position:pos}); const slot=slotsEls[pos]; slot.classList.add('filled'); const mini=document.createElement('canvas'); mini.width=200; mini.height=280; drawCard(mini,cardData.name); slot.innerHTML=''; slot.appendChild(mini); setTimeout(()=>{ cardData.element.classList.add('drawn'); cardData.element.style.pointerEvents='none'; },500); if(drawnIndices.length===3){ setTimeout(()=>{ setView('loadingView'); setTimeout(showResult,800); },800); } }
-    const API_BASE='https://lenormand-oracle.edgeone.dev/';
-    function createTypewriter(targetEl){ let queue=[], currentPara=null, buffer='', running=false, onDoneCallback=null, isDone=false; function newPara(){ currentPara=document.createElement('p'); currentPara.style.opacity='0'; currentPara.style.transition='opacity 0.4s'; targetEl.appendChild(currentPara); requestAnimationFrame(()=>{ currentPara.style.opacity='1'; }); buffer=''; } function tick(){ if(queue.length===0){ running=false; if(isDone && onDoneCallback) onDoneCallback(); return; } const ch=queue.shift(); if(ch==='\n'){ if(buffer.trim()) newPara(); } else { buffer+=ch; if(currentPara) currentPara.innerHTML=formatOracleText(buffer); } const delay=/[\u4e00-\u9fa5]/.test(ch)?38:18; setTimeout(tick,delay); } function push(text){ for(const ch of text) queue.push(ch); if(!running){ running=true; tick(); } } function finish(cb){ isDone=true; onDoneCallback=cb; if(!running && cb) cb(); } newPara(); return {push,finish}; }
-    function formatOracleText(text){ return text.replace(/【([^】]+)】/g,'<span class="oracle-card-ref">【$1】</span>').replace(/「([^」]+)」/g,'<em style="color:var(--gold-pale);opacity:0.9;">「$1」</em>'); }
-    async function fetchOracleStream(question,cards,targetEl){ targetEl.innerHTML=''; const typewriter=createTypewriter(targetEl); const response=await fetch(`${API_BASE}/oracle`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({question,cards})}); if(!response.ok){ const errText=await response.text().catch(()=>''); throw new Error(`HTTP ${response.status}${errText?': '+errText:''}`); } const reader=response.body.getReader(); const decoder=new TextDecoder('utf-8'); let sseBuffer=''; return new Promise((resolve,reject)=>{ function read(){ reader.read().then(({done,value})=>{ if(done){ typewriter.finish(resolve); return; } sseBuffer+=decoder.decode(value,{stream:true}); const parts=sseBuffer.split('\n\n'); sseBuffer=parts.pop(); for(const part of parts){ for(const line of part.split('\n')){ if(!line.startsWith('data: ')) continue; const raw=line.slice(6).trim(); if(raw==='[DONE]'){ typewriter.finish(resolve); return; } let obj; try{ obj=JSON.parse(raw); }catch{ continue; } if(obj.error){ reject(new Error(obj.error)); return; } if(obj.text){ typewriter.push(obj.text); } } } read(); }).catch(reject); } read(); }); }
-    const POSITIONS=['缘起之牌','枢转之牌','示现之牌'];
-    const CARD_MEANINGS={"骑士":"信息传递，行动在即","四叶草":"小幸运，意外喜悦","船":"远行，渴望远方","房子":"家庭，根基","树":"健康，成长","云":"疑惑，未清晰","蛇":"复杂，智慧的弯路","棺材":"终结，转化","花束":"礼物，惊喜","镰刀":"决断，果断切断","鞭子":"争论，摩擦","鸟":"焦虑，对话","小孩":"新生，初始","狐狸":"机敏，自保","熊":"权威，力量","星星":"希望，指引","鹳":"改变，转折","狗":"忠诚，信赖","塔":"孤独，边界","花园":"社交，人群","山":"阻碍，耐心","十字路口":"选择，分叉","老鼠":"损耗，焦虑","心":"爱，情感","戒指":"承诺，契约","书":"秘密，学习","信":"消息，文字","男人":"男性能量","女人":"女性能量","百合":"纯洁，平静","太阳":"成功，活力","月亮":"直觉，梦境","钥匙":"解答，机遇","鱼":"财富，流动","锚":"稳定，目标","十字架":"命运，承担"};
-    function getFallbackReading(cards){ const [a,b,c]=cards.map(x=>x.name); return `<span class="oracle-card-ref">【${a}】</span>——${CARD_MEANINGS[a]||'此牌之意，需结合全局体悟'}。往昔脉络如根，滋养此刻。<br><br><span class="oracle-card-ref">【${b}】</span>——${CARD_MEANINGS[b]||'此牌之意，需结合全局体悟'}。当下之镜映照真实。<br><br><span class="oracle-card-ref">【${c}】</span>——${CARD_MEANINGS[c]||'此牌之意，需结合全局体悟'}。未来之种已埋入季节。`; }
-    function showResult(){
-        // 先移除所有旧的签名元素，防止重复
-        const scrollDiv = document.querySelector('.oracle-scroll');
-        if (scrollDiv) {
-            scrollDiv.querySelectorAll('.oracle-signature').forEach(el => el.remove());
-        }
-        setView('resultView');
-        document.getElementById('resultView').scrollTop=0;
-        const panel=document.getElementById('resultArtifacts');
-        panel.innerHTML='';
-        drawnCardsData.forEach((card,idx)=>{
-            const block=document.createElement('div');
-            block.className='result-card-block';
-            block.style.opacity='0';
-            block.style.transform='translateY(20px)';
-            block.style.transition=`opacity 0.7s ${idx*0.18}s var(--ease-emerge), transform 0.7s ${idx*0.18}s var(--ease-emerge)`;
-            const frame=document.createElement('div');
-            frame.className='result-card-frame';
-            const cvs=document.createElement('canvas');
-            cvs.width=200;
-            cvs.height=300;
-            drawCard(cvs,card.name);
-            frame.appendChild(cvs);
-            const pos=document.createElement('div');
-            pos.className='result-position-tag';
-            pos.textContent=POSITIONS[idx];
-            block.appendChild(frame);
-            block.appendChild(pos);
-            panel.appendChild(block);
-            requestAnimationFrame(()=>{
-                setTimeout(()=>{
-                    block.style.opacity='1';
-                    block.style.transform='translateY(0)';
-                },50+idx*180);
-            });
-        });
-        document.getElementById('oracleQuestion').textContent=`「${currentQuestion||'无言之问'}」`;
-        const bodyEl=document.getElementById('oracleBody');
-        bodyEl.innerHTML='<p class="oracle-loading-hint">牌灵正在感应，稍候…</p>';
-        const cards=drawnCardsData.map((c,i)=>({name:c.name,position:POSITIONS[i]}));
-        fetchOracleStream(currentQuestion,cards,bodyEl).then(()=>{
-            // 再次确保移除可能残留的旧签名（防止极少数异步竞争）
-            if (scrollDiv) {
-                scrollDiv.querySelectorAll('.oracle-signature').forEach(el => el.remove());
-            }
-            const sign=document.createElement('div');
-            sign.className='oracle-signature';
-            sign.style.opacity='0';
-            sign.style.transition='opacity 1s 0.5s';
-            sign.textContent='— 雷诺曼神谕手札';
-            bodyEl.parentElement.appendChild(sign);
-            requestAnimationFrame(()=>{
-                sign.style.opacity='1';
-            });
-            document.querySelector('.btn-group').style.opacity='1';
-            document.querySelector('.btn-group').style.pointerEvents='auto';
-        }).catch(err=>{
-            console.error('Oracle API error:',err);
-            // 同样先清理旧签名，再写入 fallback 内容（fallback 自身已包含签名）
-            if (scrollDiv) {
-                scrollDiv.querySelectorAll('.oracle-signature').forEach(el => el.remove());
-            }
-            bodyEl.innerHTML=`<p style="color:var(--copper-pale);opacity:0.8;">星象感应出现了扰动，牌灵暂时无法应答。<br><span style="font-size:0.85em;opacity:0.6;">(${err.message||'网络连接异常，请检查后端服务是否启动'})</span></p><p style="margin-top:1.2em;">${getFallbackReading(drawnCardsData)}</p><div class="oracle-signature" style="margin-top:24px;">— 雷诺曼神谕手札</div>`;
-            document.querySelector('.btn-group').style.opacity='1';
-            document.querySelector('.btn-group').style.pointerEvents='auto';
-        });
-        document.querySelector('.btn-group').style.opacity='0';
-        document.querySelector('.btn-group').style.pointerEvents='none';
+    // ========== 雷诺曼核心业务（性能优化版）==========
+
+const LENORMAND_DECK = ["骑士","四叶草","船","房子","树","云","蛇","棺材","花束","镰刀","鞭子","鸟","小孩","狐狸","熊","星星","鹳","狗","塔","花园","山","十字路口","老鼠","心","戒指","书","信","男人","女人","百合","太阳","月亮","钥匙","鱼","锚","十字架"];
+
+function generateCardSVG(cardName) { const symbolMap = { "骑士":"♞","四叶草":"🍀","船":"⛵","房子":"🏠","树":"🌳","云":"☁","蛇":"🐍","棺材":"⚰️","花束":"💐","镰刀":"🔪","鞭子":"⚡","鸟":"🐦","小孩":"👧","狐狸":"🦊","熊":"🐻","星星":"★","鹳":"♃","狗":"🐕","塔":"♄","花园":"✾","山":"△","十字路口":"✚","老鼠":"🐭","心":"♡","戒指":"○","书":"📚","信":"✉","男人":"♂","女人":"♀","百合":"⚜","太阳":"☀","月亮":"☽","钥匙":"🔑","鱼":"🐟️","锚":"⚓","十字架":"✞" }; const numMap = { "骑士":1,"四叶草":2,"船":3,"房子":4,"树":5,"云":6,"蛇":7,"棺材":8,"花束":9,"镰刀":10,"鞭子":11,"鸟":12,"小孩":13,"狐狸":14,"熊":15,"星星":16,"鹳":17,"狗":18,"塔":19,"花园":20,"山":21,"十字路口":22,"老鼠":23,"心":24,"戒指":25,"书":26,"信":27,"男人":28,"女人":29,"百合":30,"太阳":31,"月亮":32,"钥匙":33,"鱼":34,"锚":35,"十字架":36 }; const symbol = symbolMap[cardName]||"✦"; const cardNum = numMap[cardName]||0; const numStr = cardNum>0?String(cardNum).padStart(2,'0'):''; const svgString = `<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 560" width="400" height="560"><defs><radialGradient id="bg${cardNum}" cx="50%" cy="45%" r="60%"><stop offset="0%" stop-color="#f2e8cc"/><stop offset="60%" stop-color="#dfc69a"/><stop offset="100%" stop-color="#c8ab7a"/></radialGradient><radialGradient id="glow${cardNum}" cx="50%" cy="40%" r="45%"><stop offset="0%" stop-color="#f8f0e0" stop-opacity="0.7"/><stop offset="100%" stop-color="#dfc69a" stop-opacity="0"/></radialGradient><filter id="noise${cardNum}" x="0%" y="0%" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" result="noise"/><feColorMatrix type="saturate" values="0" in="noise" result="gn"/><feBlend in="SourceGraphic" in2="gn" mode="multiply" result="out"/><feComponentTransfer in="out"><feFuncA type="linear" slope="1"/></feComponentTransfer></filter></defs><rect width="400" height="560" rx="14" fill="url(#bg${cardNum})" filter="url(#noise${cardNum})"/><rect width="400" height="560" rx="14" fill="url(#glow${cardNum})"/><rect x="10" y="10" width="380" height="540" rx="10" fill="none" stroke="#8a6430" stroke-width="1.5" opacity="0.55"/><rect x="18" y="18" width="364" height="524" rx="8" fill="none" stroke="#c4a24a" stroke-width="0.8" opacity="0.45"/><rect x="24" y="24" width="352" height="512" rx="6" fill="none" stroke="#c4a24a" stroke-width="0.4" opacity="0.25"/><g opacity="0.5" stroke="#8a6430" stroke-width="0.8" fill="none"><path d="M28,28 L28,50 M28,28 L50,28"/><path d="M372,28 L372,50 M372,28 L350,28"/><path d="M28,532 L28,510 M28,532 L50,532"/><path d="M372,532 L372,510 M372,532 L350,532"/></g><g opacity="0.35" fill="#c4a24a"><circle cx="28" cy="28" r="2.5"/><circle cx="372" cy="28" r="2.5"/><circle cx="28" cy="532" r="2.5"/><circle cx="372" cy="532" r="2.5"/></g><text x="36" y="60" font-family="'Cinzel',serif" font-size="20" fill="#6a4820" opacity="0.6" font-weight="400">${numStr}</text><line x1="36" y1="72" x2="364" y2="72" stroke="#c4a24a" stroke-width="0.6" opacity="0.35"/><circle cx="200" cy="72" r="2.5" fill="#c4a24a" opacity="0.4"/><circle cx="36" cy="72" r="1.5" fill="#c4a24a" opacity="0.3"/><circle cx="364" cy="72" r="1.5" fill="#c4a24a" opacity="0.3"/><text x="200" y="310" font-family="'Cinzel','Noto Serif SC',serif" font-size="140" fill="#3e2410" text-anchor="middle" dominant-baseline="middle" opacity="0.82">${symbol}</text><line x1="36" y1="390" x2="364" y2="390" stroke="#c4a24a" stroke-width="0.6" opacity="0.35"/><circle cx="200" cy="390" r="2.5" fill="#c4a24a" opacity="0.4"/><polygon points="200,405 212,418 200,431 188,418" fill="none" stroke="#c4a24a" stroke-width="0.7" opacity="0.4"/><circle cx="200" cy="418" r="2" fill="#c4a24a" opacity="0.35"/><text x="200" y="468" font-family="'Cormorant Garamond','Noto Serif SC',serif" font-size="38" font-weight="600" fill="#3e2410" text-anchor="middle" letter-spacing="5" opacity="0.88">${cardName}</text><line x1="110" y1="494" x2="290" y2="494" stroke="#8a6430" stroke-width="0.7" opacity="0.4"/><circle cx="200" cy="494" r="2.5" fill="#c4a24a" opacity="0.4"/><line x1="140" y1="507" x2="260" y2="507" stroke="#c4a24a" stroke-width="0.4" opacity="0.25"/></svg>`; return `data:image/svg+xml;base64,${btoa(unescape(encodeURIComponent(svgString)))}`; }
+
+const imageCache = new Map(); function preloadAllCards(){ for(const name of LENORMAND_DECK){ const url=generateCardSVG(name); const img=new Image(); img.src=url; imageCache.set(name,{url,img}); } }
+
+function drawCard(canvas, cardName){ const ctx=canvas.getContext('2d'); const tw=canvas.width, th=canvas.height; let ce=imageCache.get(cardName); if(!ce){ const url=generateCardSVG(cardName); const img=new Image(); img.src=url; ce={url,img}; imageCache.set(cardName,ce); } const img=ce.img; if(img.complete && img.naturalWidth>0){ ctx.clearRect(0,0,tw,th); ctx.drawImage(img,0,0,tw,th); } else { ctx.fillStyle='#e8d9b8'; ctx.fillRect(0,0,tw,th); ctx.fillStyle='#7a5535'; ctx.font='bold 20px "Cinzel", serif'; ctx.textAlign='center'; ctx.textBaseline='middle'; ctx.fillText(cardName,tw/2,th/2); img.onload=()=>{ ctx.clearRect(0,0,tw,th); ctx.drawImage(img,0,0,tw,th); }; } }
+
+function makeCardBackSVG(){ const el = document.createElementNS('http://www.w3.org/2000/svg','svg'); el.setAttribute('viewBox','0 0 60 60'); el.setAttribute('class','card-back-svg'); el.innerHTML = `<circle cx="30" cy="30" r="26" stroke="#c4a24a" stroke-width="0.7" fill="none" opacity="0.55"/><circle cx="30" cy="30" r="18" stroke="#c4a24a" stroke-width="0.5" fill="none" opacity="0.4"/><circle cx="30" cy="30" r="10" stroke="#c4a24a" stroke-width="0.4" fill="none" opacity="0.3"/><polygon points="30,4 52,43 8,43" stroke="#c4a24a" stroke-width="0.6" fill="none" opacity="0.45"/><polygon points="30,56 8,17 52,17" stroke="#c4a24a" stroke-width="0.6" fill="none" opacity="0.45"/><line x1="30" y1="4" x2="30" y2="56" stroke="#c4a24a" stroke-width="0.35" opacity="0.3"/><line x1="4" y1="30" x2="56" y2="30" stroke="#c4a24a" stroke-width="0.35" opacity="0.3"/><line x1="10" y1="10" x2="50" y2="50" stroke="#c4a24a" stroke-width="0.3" opacity="0.2"/><line x1="50" y1="10" x2="10" y2="50" stroke="#c4a24a" stroke-width="0.3" opacity="0.2"/><circle cx="30" cy="30" r="3" fill="rgba(196,162,74,0.25)" stroke="#c4a24a" stroke-width="0.5" opacity="0.7"/><circle cx="30" cy="30" r="1" fill="#c4a24a" opacity="0.8"/><circle cx="30" cy="4" r="1.5" fill="#c4a24a" opacity="0.5"/><circle cx="30" cy="56" r="1.5" fill="#c4a24a" opacity="0.5"/><circle cx="4" cy="30" r="1.5" fill="#c4a24a" opacity="0.5"/><circle cx="56" cy="30" r="1.5" fill="#c4a24a" opacity="0.5"/>`; return el; }
+
+let shuffledCards=[], drawnIndices=[], drawnCardsData=[], currentQuestion="", slotsEls=[];
+
+// ── 优化点①：提前发起请求的 Promise 占位 ──
+// 抽第3张牌时立即 fetch，showResult 时复用，消除整段等待
+let prefetchPromise = null;
+
+function shuffle(arr){ const a=[...arr]; for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+
+function setView(id){ document.querySelectorAll('.view').forEach(v=>v.classList.remove('active')); document.getElementById(id).classList.add('active'); }
+
+function resetSlotsToEmpty(){ const symbols=['☽','◈','☉']; const labels=['缘起之牌','枢转之牌','示现之牌']; slotsEls.forEach((slot,idx)=>{ slot.classList.remove('filled'); slot.innerHTML=`<div class="slot-symbol">${symbols[idx]}</div><div class="slot-label">${labels[idx]}</div>`; }); }
+
+function initDeck(){ const stage=document.getElementById('ritualDeck'); stage.innerHTML=''; shuffledCards=[]; drawnIndices=[]; drawnCardsData=[]; prefetchPromise=null; const names=shuffle(LENORMAND_DECK); const total=names.length; const isMobile=window.innerWidth<600; const spread=isMobile?58:48; const step=(spread*2)/(total-1); const rX=isMobile?Math.min(window.innerWidth*0.55,320):420; const rY=isMobile?100:170; names.forEach((name,i)=>{ const wrapper=document.createElement('div'); wrapper.className='tarot-card'; const back=document.createElement('div'); back.className='card-back'; back.appendChild(makeCardBackSVG()); const front=document.createElement('div'); front.className='card-front'; const cvs=document.createElement('canvas'); cvs.className='card-canvas'; cvs.width=300; cvs.height=464; drawCard(cvs,name); front.appendChild(cvs); wrapper.appendChild(back); wrapper.appendChild(front); const angleDeg=-spread+i*step; const rad=angleDeg*Math.PI/180; const tx=Math.sin(rad)*rX; const ty=-Math.cos(rad)*rY+(isMobile?10:5); const rot=angleDeg*0.7; wrapper.style.setProperty('--tx',tx+'px'); wrapper.style.setProperty('--ty',ty+'px'); wrapper.style.setProperty('--rot',rot+'deg'); wrapper.style.left=`calc(50% - ${parseInt(getComputedStyle(document.documentElement).getPropertyValue('--card-w'))/2}px)`; wrapper.style.top='48%'; const cardData={name,element:wrapper,drawn:false,index:i}; shuffledCards.push(cardData); wrapper.addEventListener('click',e=>{ e.stopPropagation(); if(drawnIndices.length>=3||cardData.drawn) return; performDraw(cardData); }); stage.appendChild(wrapper); }); resetSlotsToEmpty(); }
+
+// ── 优化点②：performDraw 在第3张牌翻开时立即预请求，不等动画结束 ──
+function performDraw(cardData){
+  if(drawnIndices.length>=3) return;
+  const pos=drawnIndices.length;
+  cardData.drawn=true;
+  cardData.element.classList.add('flipped');
+  drawnIndices.push(cardData.index);
+  drawnCardsData.push({name:cardData.name,position:pos});
+  const slot=slotsEls[pos];
+  slot.classList.add('filled');
+  const mini=document.createElement('canvas');
+  mini.width=200; mini.height=280;
+  drawCard(mini,cardData.name);
+  slot.innerHTML=''; slot.appendChild(mini);
+  setTimeout(()=>{ cardData.element.classList.add('drawn'); cardData.element.style.pointerEvents='none'; },500);
+
+  if(drawnIndices.length===3){
+    // ── 立即开始 prefetch，不等待任何动画 ──
+    const cards = drawnCardsData.map((c,i)=>({name:c.name,position:POSITIONS[i]}));
+    prefetchPromise = startOracleFetch(currentQuestion, cards);
+
+    // ── 优化点③：动画结束后直接切换，不再 setTimeout 1800ms ──
+    setTimeout(()=>{
+      setView('loadingView');
+      startLoadingTextCycle(); // 轮播文字给用户进度感
+      showResult();
+    }, 600); // 只等卡牌翻转动画（600ms），不额外等待
+  }
+}
+
+// ── 优化点④：loading 文字轮播，消除"无进展"的焦虑感 ──
+let _loadingCycleTimer = null;
+function startLoadingTextCycle(){
+  const el = document.querySelector('.loading-text');
+  if(!el) return;
+  const msgs = [
+    '星盘正在感应牌阵…',
+    '牌灵解读命运序列…',
+    '洞悉缘起与示现…',
+    '谕示即将浮现…',
+  ];
+  let idx = 0;
+  el.textContent = msgs[0];
+  if(_loadingCycleTimer) clearInterval(_loadingCycleTimer);
+  _loadingCycleTimer = setInterval(()=>{
+    idx = (idx+1) % msgs.length;
+    el.style.opacity='0';
+    setTimeout(()=>{ el.textContent=msgs[idx]; el.style.opacity=''; }, 300);
+  }, 1800);
+}
+function stopLoadingTextCycle(){
+  if(_loadingCycleTimer){ clearInterval(_loadingCycleTimer); _loadingCycleTimer=null; }
+}
+
+const API_BASE='https://lenormand-oracle.edgeone.dev';
+
+// ── 核心：把网络请求单独抽出，返回包含 reader 和 typewriter 对接的 Promise ──
+// 注意：此函数只负责 fetch + 解析 SSE 流，不操作 DOM
+// 返回一个 Promise，resolve 时带全部文本；过程中通过 onChunk 回调传递片段
+function startOracleFetch(question, cards){
+  // 返回一个对象：{ streamPromise, getChunks }
+  // 用 ReadableStream 分叉，让 showResult 里的 typewriter 直接消费
+  const chunkCallbacks = [];
+  let resolveStream, rejectStream;
+  const streamPromise = new Promise((res,rej)=>{ resolveStream=res; rejectStream=rej; });
+
+  // 立即发起 fetch
+  fetch(`${API_BASE}/oracle`,{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({question,cards})
+  }).then(async response=>{
+    if(!response.ok){
+      const errText=await response.text().catch(()=>'');
+      rejectStream(new Error(`HTTP ${response.status}${errText?': '+errText:''}`));
+      return;
     }
-    function fullReset(){ shuffledCards=[]; drawnIndices=[]; drawnCardsData=[]; currentQuestion=""; const divineInput=document.getElementById('divineQuestion'); divineInput.value=''; divineInput.style.height='auto'; resetSlotsToEmpty(); setView('introView'); }
-    function redrawCards(){ if(!currentQuestion){ setView('questionView'); return; } shuffledCards=[]; drawnIndices=[]; drawnCardsData=[]; const stage=document.getElementById('ritualDeck'); stage.innerHTML=''; resetSlotsToEmpty(); initDeck(); document.getElementById('drawQuestionDisplay').textContent=currentQuestion; setView('drawView'); }
-    function showCopyToast(msg){ const toast=document.getElementById('copyToast'); if(!toast) return; toast.textContent=msg||'✦ 谕示已铭刻于剪贴板 ✦'; toast.classList.add('show'); setTimeout(()=>{ toast.classList.remove('show'); },2200); }
-    async function copyOracleHandler(){ const bodyEl=document.getElementById('oracleBody'); if(bodyEl.querySelector('.oracle-loading-hint')){ showCopyToast('✦ 神谕凝聚中，稍后再试 ✦'); return; } const oracleScroll=document.querySelector('.oracle-scroll'); if(!oracleScroll) return; let interpretationText=''; const bodyClone=bodyEl.cloneNode(true); bodyClone.querySelectorAll('.oracle-card-ref, em').forEach(el=>{ const span=document.createElement('span'); span.textContent=el.textContent; el.parentNode.replaceChild(span,el); }); interpretationText=bodyClone.innerText.trim(); const signatureElem=document.querySelector('.oracle-signature'); const signature=signatureElem?signatureElem.innerText.trim():''; const questionText=document.getElementById('oracleQuestion')?.innerText||`「${currentQuestion||'无言之问'}」`; const cardsText=drawnCardsData.map((card,idx)=>`${POSITIONS[idx]}：【${card.name}】`).join('\n'); const copyContent=`【灵境·雷诺曼神谕手札】\n\n问卜之念：${questionText.replace(/^「|」$/g,'')}\n\n抽得牌阵：\n${cardsText}\n\n神谕回响：\n${interpretationText}\n${signature?`\n${signature}`:'— 雷诺曼神谕手札'}\n\n—— 谕示抄录于星历 ——`; try{ await navigator.clipboard.writeText(copyContent); showCopyToast('✦ 谕示已铭刻于剪贴板 ✦'); }catch(err){ showCopyToast('❄ 铭刻失败，可手动摘录'); console.warn(err); } }
-    document.getElementById('startBtn').onclick=()=>setView('questionView');
-    const divineInput=document.getElementById('divineQuestion'); divineInput.addEventListener('input',function(){ this.style.height='auto'; this.style.height=this.scrollHeight+'px'; const err=document.getElementById('questionError'); if(err.classList.contains('visible')) err.classList.remove('visible'); });
-    divineInput.addEventListener('keydown',(e)=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); document.getElementById('confirmQuestionBtn').click(); } });
-    document.getElementById('confirmQuestionBtn').onclick=()=>{ const inp=document.getElementById('divineQuestion'); const err=document.getElementById('questionError'); const val=inp.value.trim(); if(!val){ err.classList.add('visible'); inp.focus(); return; } currentQuestion=val; document.getElementById('drawQuestionDisplay').textContent=currentQuestion; setView('drawView'); initDeck(); };
-    document.getElementById('redrawBtn').onclick=redrawCards;
-    document.getElementById('restartRitual').onclick=fullReset;
-    document.getElementById('copyOracleBtn').onclick=copyOracleHandler;
-    window.addEventListener('resize',()=>{ if(document.getElementById('drawView').classList.contains('active') && drawnIndices.length===0) initDeck(); });
-    window.onload=()=>{ slotsEls=Array.from(document.querySelectorAll('.slot')); preloadAllCards(); };
+    const reader=response.body.getReader();
+    const decoder=new TextDecoder('utf-8');
+    let sseBuffer='';
+    try{
+      while(true){
+        const {done,value}=await reader.read();
+        if(done){ resolveStream(); break; }
+        sseBuffer+=decoder.decode(value,{stream:true});
+        const parts=sseBuffer.split('\n\n');
+        sseBuffer=parts.pop();
+        for(const part of parts){
+          for(const line of part.split('\n')){
+            if(!line.startsWith('data: ')) continue;
+            const raw=line.slice(6).trim();
+            if(raw==='[DONE]'){ resolveStream(); return; }
+            let obj; try{ obj=JSON.parse(raw); }catch{ continue; }
+            if(obj.error){ rejectStream(new Error(obj.error)); return; }
+            if(obj.text){ chunkCallbacks.forEach(cb=>cb(obj.text)); }
+          }
+        }
+      }
+    }catch(err){ rejectStream(err); }
+  }).catch(rejectStream);
+
+  return {
+    streamPromise,
+    onChunk(cb){ chunkCallbacks.push(cb); }
+  };
+}
+
+// ── 优化点⑤：打字机速度大幅提升；汉字 38ms→12ms，英文 18ms→6ms ──
+function createTypewriter(targetEl){
+  let queue=[], currentPara=null, buffer='', running=false, onDoneCallback=null, isDone=false;
+  function newPara(){
+    currentPara=document.createElement('p');
+    currentPara.style.opacity='0';
+    currentPara.style.transition='opacity 0.4s';
+    targetEl.appendChild(currentPara);
+    requestAnimationFrame(()=>{ currentPara.style.opacity='1'; });
+    buffer='';
+  }
+  function tick(){
+    if(queue.length===0){
+      running=false;
+      if(isDone && onDoneCallback) onDoneCallback();
+      return;
+    }
+    const ch=queue.shift();
+    if(ch==='\n'){ if(buffer.trim()) newPara(); }
+    else {
+      buffer+=ch;
+      if(currentPara) currentPara.innerHTML=formatOracleText(buffer);
+    }
+    // ── 提速：汉字 12ms，其余 6ms（原来 38ms / 18ms）──
+    const delay=/[\u4e00-\u9fa5]/.test(ch)?12:6;
+    setTimeout(tick,delay);
+  }
+  function push(text){ for(const ch of text) queue.push(ch); if(!running){ running=true; tick(); } }
+  function finish(cb){ isDone=true; onDoneCallback=cb; if(!running && cb) cb(); }
+  newPara();
+  return {push,finish};
+}
+
+function formatOracleText(text){ return text.replace(/【([^】]+)】/g,'<span class="oracle-card-ref">【$1】</span>').replace(/「([^」]+)」/g,'<em style="color:var(--gold-pale);opacity:0.9;">「$1」</em>'); }
+
+const POSITIONS=['缘起之牌','枢转之牌','示现之牌'];
+
+const CARD_MEANINGS={"骑士":"信息传递，行动在即","四叶草":"小幸运，意外喜悦","船":"远行，渴望远方","房子":"家庭，根基","树":"健康，成长","云":"疑惑，未清晰","蛇":"复杂，智慧的弯路","棺材":"终结，转化","花束":"礼物，惊喜","镰刀":"决断，果断切断","鞭子":"争论，摩擦","鸟":"焦虑，对话","小孩":"新生，初始","狐狸":"机敏，自保","熊":"权威，力量","星星":"希望，指引","鹳":"改变，转折","狗":"忠诚，信赖","塔":"孤独，边界","花园":"社交，人群","山":"阻碍，耐心","十字路口":"选择，分叉","老鼠":"损耗，焦虑","心":"爱，情感","戒指":"承诺，契约","书":"秘密，学习","信":"消息，文字","男人":"男性能量","女人":"女性能量","百合":"纯洁，平静","太阳":"成功，活力","月亮":"直觉，梦境","钥匙":"解答，机遇","鱼":"财富，流动","锚":"稳定，目标","十字架":"命运，承担"};
+
+function getFallbackReading(cards){ const [a,b,c]=cards.map(x=>x.name); return `<span class="oracle-card-ref">【${a}】</span>——${CARD_MEANINGS[a]||'此牌之意，需结合全局体悟'}。往昔脉络如根，滋养此刻。<br><br><span class="oracle-card-ref">【${b}】</span>——${CARD_MEANINGS[b]||'此牌之意，需结合全局体悟'}。当下之镜映照真实。<br><br><span class="oracle-card-ref">【${c}】</span>——${CARD_MEANINGS[c]||'此牌之意，需结合全局体悟'}。未来之种已埋入季节。`; }
+
+// ── showResult：直接复用 prefetchPromise，跳过重复 fetch ──
+function showResult(){
+  const scrollDiv = document.querySelector('.oracle-scroll');
+  if(scrollDiv){ scrollDiv.querySelectorAll('.oracle-signature').forEach(el=>el.remove()); }
+  setView('resultView');
+  document.getElementById('resultView').scrollTop=0;
+  stopLoadingTextCycle();
+
+  const panel=document.getElementById('resultArtifacts');
+  panel.innerHTML='';
+  drawnCardsData.forEach((card,idx)=>{
+    const block=document.createElement('div');
+    block.className='result-card-block';
+    block.style.opacity='0'; block.style.transform='translateY(20px)';
+    block.style.transition=`opacity 0.7s ${idx*0.18}s var(--ease-emerge), transform 0.7s ${idx*0.18}s var(--ease-emerge)`;
+    const frame=document.createElement('div'); frame.className='result-card-frame';
+    const cvs=document.createElement('canvas'); cvs.width=200; cvs.height=300;
+    drawCard(cvs,card.name); frame.appendChild(cvs);
+    const pos=document.createElement('div'); pos.className='result-position-tag'; pos.textContent=POSITIONS[idx];
+    block.appendChild(frame); block.appendChild(pos); panel.appendChild(block);
+    requestAnimationFrame(()=>{ setTimeout(()=>{ block.style.opacity='1'; block.style.transform='translateY(0)'; },50+idx*180); });
+  });
+
+  document.getElementById('oracleQuestion').textContent=`「${currentQuestion||'无言之问'}」`;
+  const bodyEl=document.getElementById('oracleBody');
+  bodyEl.innerHTML='<p class="oracle-loading-hint">牌灵正在感应，稍候…</p>';
+
+  document.querySelector('.btn-group').style.opacity='0';
+  document.querySelector('.btn-group').style.pointerEvents='none';
+
+  // ── 直接使用已经在途的 prefetchPromise，不重新发请求 ──
+  const typewriter = createTypewriter(bodyEl);
+  bodyEl.innerHTML=''; // 清除 loading hint，打字机接管
+
+  const fetcher = prefetchPromise; // 已在 performDraw 里发起
+  fetcher.onChunk(text=>typewriter.push(text));
+
+  fetcher.streamPromise.then(()=>{
+    typewriter.finish(()=>{
+      if(scrollDiv){ scrollDiv.querySelectorAll('.oracle-signature').forEach(el=>el.remove()); }
+      const sign=document.createElement('div');
+      sign.className='oracle-signature'; sign.style.opacity='0'; sign.style.transition='opacity 1s 0.5s';
+      sign.textContent='— 雷诺曼神谕手札';
+      bodyEl.parentElement.appendChild(sign);
+      requestAnimationFrame(()=>{ sign.style.opacity='1'; });
+      document.querySelector('.btn-group').style.opacity='1';
+      document.querySelector('.btn-group').style.pointerEvents='auto';
+    });
+  }).catch(err=>{
+    console.error('Oracle API error:',err);
+    if(scrollDiv){ scrollDiv.querySelectorAll('.oracle-signature').forEach(el=>el.remove()); }
+    bodyEl.innerHTML=`<p style="color:var(--copper-pale);opacity:0.8;">星象感应出现了扰动，牌灵暂时无法应答。<br><span style="font-size:0.85em;opacity:0.6;">(${err.message||'网络连接异常'})</span></p><p style="margin-top:1.2em;">${getFallbackReading(drawnCardsData)}</p><div class="oracle-signature" style="margin-top:24px;">— 雷诺曼神谕手札</div>`;
+    document.querySelector('.btn-group').style.opacity='1';
+    document.querySelector('.btn-group').style.pointerEvents='auto';
+  });
+}
+
+function fullReset(){ shuffledCards=[]; drawnIndices=[]; drawnCardsData=[]; currentQuestion=""; prefetchPromise=null; const divineInput=document.getElementById('divineQuestion'); divineInput.value=''; divineInput.style.height='auto'; resetSlotsToEmpty(); setView('introView'); }
+
+function redrawCards(){ if(!currentQuestion){ setView('questionView'); return; } shuffledCards=[]; drawnIndices=[]; drawnCardsData=[]; prefetchPromise=null; const stage=document.getElementById('ritualDeck'); stage.innerHTML=''; resetSlotsToEmpty(); initDeck(); document.getElementById('drawQuestionDisplay').textContent=currentQuestion; setView('drawView'); }
+
+function showCopyToast(msg){ const toast=document.getElementById('copyToast'); if(!toast) return; toast.textContent=msg||'✦ 谕示已铭刻于剪贴板 ✦'; toast.classList.add('show'); setTimeout(()=>{ toast.classList.remove('show'); },2200); }
+
+async function copyOracleHandler(){ const bodyEl=document.getElementById('oracleBody'); if(bodyEl.querySelector('.oracle-loading-hint')){ showCopyToast('✦ 神谕凝聚中，稍后再试 ✦'); return; } const oracleScroll=document.querySelector('.oracle-scroll'); if(!oracleScroll) return; let interpretationText=''; const bodyClone=bodyEl.cloneNode(true); bodyClone.querySelectorAll('.oracle-card-ref, em').forEach(el=>{ const span=document.createElement('span'); span.textContent=el.textContent; el.parentNode.replaceChild(span,el); }); interpretationText=bodyClone.innerText.trim(); const signatureElem=document.querySelector('.oracle-signature'); const signature=signatureElem?signatureElem.innerText.trim():''; const questionText=document.getElementById('oracleQuestion')?.innerText||`「${currentQuestion||'无言之问'}」`; const cardsText=drawnCardsData.map((card,idx)=>`${POSITIONS[idx]}：【${card.name}】`).join('\n'); const copyContent=`【灵境·雷诺曼神谕手札】\n\n问卜之念：${questionText.replace(/^「|」$/g,'')}\n\n抽得牌阵：\n${cardsText}\n\n神谕回响：\n${interpretationText}\n${signature?`\n${signature}`:'— 雷诺曼神谕手札'}\n\n—— 谕示抄录于星历 ——`; try{ await navigator.clipboard.writeText(copyContent); showCopyToast('✦ 谕示已铭刻于剪贴板 ✦'); }catch(err){ showCopyToast('❄ 铭刻失败，可手动摘录'); console.warn(err); } }
+
+document.getElementById('startBtn').onclick=()=>setView('questionView');
+
+const divineInput=document.getElementById('divineQuestion'); divineInput.addEventListener('input',function(){ this.style.height='auto'; this.style.height=this.scrollHeight+'px'; const err=document.getElementById('questionError'); if(err.classList.contains('visible')) err.classList.remove('visible'); });
+
+divineInput.addEventListener('keydown',(e)=>{ if(e.key==='Enter'&&!e.shiftKey){ e.preventDefault(); document.getElementById('confirmQuestionBtn').click(); } });
+
+document.getElementById('confirmQuestionBtn').onclick=()=>{ const inp=document.getElementById('divineQuestion'); const err=document.getElementById('questionError'); const val=inp.value.trim(); if(!val){ err.classList.add('visible'); inp.focus(); return; } currentQuestion=val; document.getElementById('drawQuestionDisplay').textContent=currentQuestion; setView('drawView'); initDeck(); };
+
+document.getElementById('redrawBtn').onclick=redrawCards;
+document.getElementById('restartRitual').onclick=fullReset;
+document.getElementById('copyOracleBtn').onclick=copyOracleHandler;
+
+window.addEventListener('resize',()=>{ if(document.getElementById('drawView').classList.contains('active') && drawnIndices.length===0) initDeck(); });
+
+window.onload=()=>{ slotsEls=Array.from(document.querySelectorAll('.slot')); preloadAllCards(); };
 </script>
 </body>
 </html>
