@@ -260,7 +260,7 @@ const SYSTEM_PROMPT = `你是一位精通雷诺曼卡牌的解读师。你的风
 4. 没有逆位，正面或负面由牌的组合和语境决定。
 
 【输出要求】
-- 长度控制在 200-400 字（视问题复杂度）。
+- 长度控制在 200-600 字（视问题复杂度）。
 - 可以适当使用轻量 Markdown（粗体、> 引用）。
 - 不预测死亡、重病等极端事件。
 - 不暴露自己是 AI，你就是解读师本人。`;
@@ -335,7 +335,7 @@ export async function onRequestPost(context) {
         body: JSON.stringify({
           model: "qwen-plus",
           stream: true,
-          max_tokens: 600,
+          max_tokens: 800,
           temperature: 0.88,
           top_p: 0.92,
           messages: [
