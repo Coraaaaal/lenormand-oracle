@@ -146,41 +146,19 @@ function getCardTags(cardName) {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 4. 规则匹配（精确复现 app.py match_rule 逻辑）
-//    原始 JSON condition 格式：{ card1_tags: { reality:[...] }, card2_tags: { dynamic:[...] } }
-//    每个字段取对应维度的值做包含匹配
+// 4. 规则匹配（与 server-v2.py match_rule 逻辑完全一致）
+//
+// 原版 Flask 的处理方式：
+//   c1_keywords = cond.get("card1_tags", [])   → 直接把整个 card1_tags 对象当列表用
+//   for kw in kw_list → 遍历 dict 得到的是 key 字符串（"reality","dynamic"...）
+//   if ":" in kw → 永远为 False（key 不含冒号）
+//   所以 contains_keyword 永远返回 False，规则从未触发
+//
+// 此 JS 版忠实复现这个行为：规则匹配恒返回空字符串，与原版一致。
 // ─────────────────────────────────────────────────────────────
-function matchRule(card1Tags, card2Tags) {
-  for (const rule of LENORMAND_DB.rules) {
-    const cond = rule.condition || {};
-
-    // R8 是人物牌规则，无法通过标签匹配，跳过（需要额外字段支持）
-    if (cond.card1_is_person || cond.card2_is_descriptor) continue;
-
-    const c1Cond = cond.card1_tags || {};
-    const c2Cond = cond.card2_tags || {};
-
-    // 对每个条件维度，检查牌的对应维度文本是否包含任意一个关键词
-    function tagsMatch(cardTags, condObj) {
-      for (const [dim, keywords] of Object.entries(condObj)) {
-        // dim 是 "reality" / "dynamic" / "emotion" / "time"
-        const cardText = cardTags[dim] || "";
-        const hit = keywords.some(kw => cardText.includes(kw));
-        if (!hit) return false;
-      }
-      return true;
-    }
-
-    // 两张牌的条件必须同时满足
-    if (
-      Object.keys(c1Cond).length > 0 &&
-      Object.keys(c2Cond).length > 0 &&
-      tagsMatch(card1Tags, c1Cond) &&
-      tagsMatch(card2Tags, c2Cond)
-    ) {
-      return rule.output_template || rule.description || "";
-    }
-  }
+function matchRule(/* card1Tags, card2Tags */) {
+  // 原版 Flask 因数据结构不匹配导致规则永远不触发，此处保持相同行为。
+  // 若未来修复 lenormand.json 的 condition 格式，在此处实现真正的匹配逻辑。
   return "";
 }
 
@@ -201,10 +179,11 @@ function buildPrompt(question, cards) {
   const scenario = detectScenario(question);
   const scenarioData = LENORMAND_DB.scenarios[scenario] || LENORMAND_DB.scenarios.daily;
 
-  // 场景偏向：使用 bias_phrases 拼接（原版只有单字符串 bias，这里更完整）
-  const scenarioBias = scenarioData.bias_phrases
-    ? scenarioData.bias_phrases.join("，")
-    : scenarioData.name || "通用视角";
+  // 场景偏向：与 Flask 版 get_scenario_bias 完全一致
+  // 原版读取 scenarios[scenario].get("bias", "")
+  // 但 lenormand.json 中没有 "bias" 字段（只有 bias_phrases），故恒为空字符串
+  // prompt 中因此始终显示"通用视角"
+  const scenarioBias = scenarioData.bias || "";
 
   // 卡牌标签
   const cardObjs = cards.map((c, i) => ({
