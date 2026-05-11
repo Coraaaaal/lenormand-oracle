@@ -706,14 +706,16 @@ const API_BASE='https://lenormand-oracle.edgeone.dev';
 // ── 核心：把网络请求单独抽出，返回包含 reader 和 typewriter 对接的 Promise ──
 // 注意：此函数只负责 fetch + 解析 SSE 流，不操作 DOM
 // 返回一个 Promise，resolve 时带全部文本；过程中通过 onChunk 回调传递片段
+// ── 核心：把网络请求单独抽出，返回包含 reader 和 typewriter 对接的 Promise ──
+// 修复：加入 chunkBuffer，注册晚的 onChunk 回调会先收到已缓存的 chunk
 function startOracleFetch(question, cards){
-  // 返回一个对象：{ streamPromise, getChunks }
-  // 用 ReadableStream 分叉，让 showResult 里的 typewriter 直接消费
   const chunkCallbacks = [];
+  const chunkBuffer = [];       // ← 新增：缓存已到达但回调尚未注册的 chunk
+  let streamDone = false;
+  let streamError = null;
   let resolveStream, rejectStream;
   const streamPromise = new Promise((res,rej)=>{ resolveStream=res; rejectStream=rej; });
 
-  // 立即发起 fetch
   fetch(`${API_BASE}/oracle`,{
     method:'POST',
     headers:{'Content-Type':'application/json'},
@@ -721,7 +723,8 @@ function startOracleFetch(question, cards){
   }).then(async response=>{
     if(!response.ok){
       const errText=await response.text().catch(()=>'');
-      rejectStream(new Error(`HTTP ${response.status}${errText?': '+errText:''}`));
+      streamError = new Error(`HTTP ${response.status}${errText?': '+errText:''}`);
+      rejectStream(streamError);
       return;
     }
     const reader=response.body.getReader();
@@ -730,7 +733,7 @@ function startOracleFetch(question, cards){
     try{
       while(true){
         const {done,value}=await reader.read();
-        if(done){ resolveStream(); break; }
+        if(done){ streamDone=true; resolveStream(); break; }
         sseBuffer+=decoder.decode(value,{stream:true});
         const parts=sseBuffer.split('\n\n');
         sseBuffer=parts.pop();
@@ -738,19 +741,28 @@ function startOracleFetch(question, cards){
           for(const line of part.split('\n')){
             if(!line.startsWith('data: ')) continue;
             const raw=line.slice(6).trim();
-            if(raw==='[DONE]'){ resolveStream(); return; }
+            if(raw==='[DONE]'){ streamDone=true; resolveStream(); return; }
             let obj; try{ obj=JSON.parse(raw); }catch{ continue; }
-            if(obj.error){ rejectStream(new Error(obj.error)); return; }
-            if(obj.text){ chunkCallbacks.forEach(cb=>cb(obj.text)); }
+            if(obj.error){ streamError=new Error(obj.error); rejectStream(streamError); return; }
+            if(obj.text){
+              chunkBuffer.push(obj.text);              // ← 先存入缓冲
+              chunkCallbacks.forEach(cb=>cb(obj.text)); // ← 再派发给已注册的回调
+            }
           }
         }
       }
-    }catch(err){ rejectStream(err); }
-  }).catch(rejectStream);
+    }catch(err){ streamError=err; rejectStream(err); }
+  }).catch(err=>{ streamError=err; rejectStream(err); });
 
   return {
     streamPromise,
-    onChunk(cb){ chunkCallbacks.push(cb); }
+    onChunk(cb){
+      // ← 注册时先把缓冲里已有的 chunk 全部回放给新回调
+      chunkBuffer.forEach(text=>cb(text));
+      if(!streamDone && !streamError){
+        chunkCallbacks.push(cb); // 流还没结束，继续实时接收
+      }
+    }
   };
 }
 
